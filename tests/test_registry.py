@@ -63,6 +63,25 @@ def test_the_cli_explains_why_ebay_is_disabled():
     assert "BONNEAFFAIRE_EBAY_CLIENT_ID" in result.output
 
 
+def test_list_providers_shows_ebay_disabled_with_the_reason():
+    infos = {info.name: info for info in default_core({}).list_providers()}
+
+    assert infos["ebay"].enabled is False
+    assert infos["ebay"].native_filters == ["price_min", "price_max", "condition", "sort"]
+    assert infos["ebay"].listing_details
+    assert "BONNEAFFAIRE_EBAY_CLIENT_ID" in (infos["ebay"].disabled_reason or "")
+    assert infos["ldlc"].disabled_reason is None
+
+
+def test_the_cli_providers_command_says_why_ebay_is_disabled():
+    app = make_app(lambda: default_core({}))
+
+    result = CliRunner(env={"COLUMNS": "200"}).invoke(app, ["providers"])
+
+    assert result.exit_code == 0, result.output
+    assert "ebay: disabled, no eBay credentials" in result.output
+
+
 def test_politeness_has_polite_defaults():
     assert politeness_from({}) == Politeness(
         rates={}, default_rate=20, cache_seconds=120, backoff_seconds=600

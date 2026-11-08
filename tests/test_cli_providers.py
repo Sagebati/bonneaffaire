@@ -81,4 +81,5 @@ def test_providers_prints_json_on_request():
         "native_urls": True,
         "listing_details": True,
         "extras": ["category"],
+        "disabled_reason": None,
     }

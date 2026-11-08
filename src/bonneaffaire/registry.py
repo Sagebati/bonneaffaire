@@ -25,18 +25,16 @@ DEFAULT_BACKOFF_SECONDS = 600.0
 def default_providers(
     environ: Mapping[str, str] = os.environ,
 ) -> tuple[list[Provider], dict[str, str]]:
-    """The Providers that can run with this configuration, and why the others cannot."""
-    providers: list[Provider] = [ldlc()]
+    """Every Provider, and why those that cannot run with this configuration cannot."""
     unavailable: dict[str, str] = {}
     client_id = environ.get(EBAY_CLIENT_ID_VARIABLE, "").strip()
     client_secret = environ.get(EBAY_CLIENT_SECRET_VARIABLE, "").strip()
-    if client_id and client_secret:
-        providers.append(ebay(EbayCredentials(client_id, client_secret)))
-    else:
+    credentials = EbayCredentials(client_id, client_secret) if client_id and client_secret else None
+    if credentials is None:
         unavailable["ebay"] = (
             f"no eBay credentials: set {EBAY_CLIENT_ID_VARIABLE} and {EBAY_CLIENT_SECRET_VARIABLE}"
         )
-    return providers, unavailable
+    return [ldlc(), ebay(credentials)], unavailable
 
 
 def default_core(environ: Mapping[str, str] = os.environ) -> Bonneaffaire:

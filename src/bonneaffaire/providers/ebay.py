@@ -45,6 +45,7 @@ MARKETPLACE = "EBAY_FR"
 TIMEOUT_SECONDS = 15.0
 MAX_PAGE_SIZE = 200
 TOKEN_RENEWAL_MARGIN_SECONDS = 60
+NO_CREDENTIALS = "no eBay credentials configured"
 SORTS = {Sort.PRICE: "price", Sort.RECENCY: "newlyListed"}
 """eBay's price sort orders by price plus shipping; the core re-sorts merged Listings anyway."""
 
@@ -85,7 +86,7 @@ class EbayProvider:
 
     def __init__(
         self,
-        credentials: EbayCredentials,
+        credentials: EbayCredentials | None,
         client: httpx.AsyncClient | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
@@ -197,6 +198,8 @@ class EbayProvider:
 
     async def _access_token(self, *, renew: bool = False) -> str:
         """The application token, fetched with client credentials and renewed before expiry."""
+        if self._credentials is None:
+            raise ProviderError(NAME, NO_CREDENTIALS)
         if renew or self._token is None or self._clock() >= self._token_expires_at:
             response = await self._send(
                 "POST",
@@ -336,5 +339,7 @@ def _datetime(value: object) -> datetime | None:
         return None
 
 
-def ebay(credentials: EbayCredentials, client: httpx.AsyncClient | None = None) -> EbayProvider:
+def ebay(
+    credentials: EbayCredentials | None, client: httpx.AsyncClient | None = None
+) -> EbayProvider:
     return EbayProvider(credentials, client=client)

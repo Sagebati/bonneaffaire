@@ -96,6 +96,9 @@ class Bonneaffaire:
                 native_urls=provider.capabilities.native_urls,
                 listing_details=provider.capabilities.listing_details,
                 extras=sorted(provider.capabilities.extras),
+                disabled_reason=None
+                if provider.name in self._providers
+                else self._disabled.get(provider.name),
             )
             for provider in self._all
         ]

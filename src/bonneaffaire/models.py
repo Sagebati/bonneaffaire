@@ -239,6 +239,7 @@ class ProviderInfo(BaseModel):
     native_urls: whether a Search can take a Native URL copied from its website.
     listing_details: whether Get Listing works for its Listings.
     extras: names of the Provider-specific extras it accepts.
+    disabled_reason: why a disabled Provider is off, when known (e.g. missing credentials).
     """
 
     name: str
@@ -248,6 +249,7 @@ class ProviderInfo(BaseModel):
     native_urls: bool
     listing_details: bool
     extras: list[str]
+    disabled_reason: str | None = None
 
 
 class SearchResult(BaseModel):
