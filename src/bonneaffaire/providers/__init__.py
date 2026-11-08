@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
 
-from bonneaffaire.models import Listing, SearchQuery
+from bonneaffaire.models import Listing, ListingDetails, SearchQuery
 
 
 @dataclass(frozen=True)
@@ -35,6 +35,19 @@ class Provider(Protocol):
 
     async def search(self, query: SearchQuery, limit: int) -> list[Listing]:
         """Return at most `limit` Listings, or raise a ProviderError."""
+        ...
+
+
+@runtime_checkable
+class ListingDetailsProvider(Provider, Protocol):
+    """A Provider that declares `listing_details` also implements these."""
+
+    def listing_id_from_url(self, url: str) -> str | None:
+        """The Provider ID in one of this Provider's Listing URLs, or None if it isn't one."""
+        ...
+
+    async def get_listing(self, provider_id: str) -> ListingDetails:
+        """Return full details, or raise ListingNotFound or another ProviderError."""
         ...
 
 
@@ -74,6 +87,7 @@ class ListingNotFound(ProviderError):
 
 __all__ = [
     "Capabilities",
+    "ListingDetailsProvider",
     "ListingNotFound",
     "NativeUrlProvider",
     "Provider",

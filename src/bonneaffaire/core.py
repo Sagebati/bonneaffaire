@@ -2,10 +2,14 @@
 
 import asyncio
 from collections.abc import Iterable
+from typing import TypeIs
 
 from bonneaffaire.filters import apply_locally, plan
 from bonneaffaire.models import (
     Listing,
+    ListingRequest,
+    ListingResult,
+    ListingStatus,
     OutcomeStatus,
     ProviderOutcome,
     SearchQuery,
@@ -14,6 +18,8 @@ from bonneaffaire.models import (
     Sort,
 )
 from bonneaffaire.providers import (
+    ListingDetailsProvider,
+    ListingNotFound,
     NativeUrlProvider,
     Provider,
     ProviderBlocked,
@@ -86,6 +92,55 @@ class Bonneaffaire:
             result.listings = sort_listings(result.listings, request.query.sort)
         return result
 
+    async def get_listing(self, request: ListingRequest) -> ListingResult:
+        """Get one Listing's full details. Never raises ProviderErrors; reports a status."""
+        if request.url is not None:
+            for provider in self.providers:
+                if not _has_listing_details(provider):
+                    continue
+                provider_id = provider.listing_id_from_url(request.url)
+                if provider_id is not None:
+                    return await self._get_listing(provider, provider_id)
+            return ListingResult(
+                status=ListingStatus.UNSUPPORTED,
+                message=f"no Provider with Listing details recognises {request.url}",
+            )
+        assert request.provider is not None and request.provider_id is not None
+        provider = self._providers.get(request.provider)
+        if provider is None:
+            return ListingResult(
+                status=ListingStatus.UNSUPPORTED,
+                message=f"no enabled Provider named {request.provider}",
+            )
+        if not _has_listing_details(provider):
+            return ListingResult(
+                status=ListingStatus.UNSUPPORTED,
+                provider=provider.name,
+                message=f"{provider.name} does not support Listing details",
+            )
+        return await self._get_listing(provider, request.provider_id)
+
+    async def _get_listing(
+        self, provider: ListingDetailsProvider, provider_id: str
+    ) -> ListingResult:
+        def failure(status: ListingStatus, message: str) -> ListingResult:
+            return ListingResult(status=status, provider=provider.name, message=message)
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                listing = await provider.get_listing(provider_id)
+        except ListingNotFound as exc:
+            return failure(ListingStatus.NOT_FOUND, exc.message)
+        except ProviderBlocked as exc:
+            return failure(ListingStatus.BLOCKED, exc.message)
+        except ProviderTimeout as exc:
+            return failure(ListingStatus.TIMED_OUT, exc.message)
+        except TimeoutError:
+            return failure(ListingStatus.TIMED_OUT, f"no answer within {self._timeout}s")
+        except ProviderError as exc:
+            return failure(ListingStatus.FAILED, exc.message)
+        return ListingResult(status=ListingStatus.OK, provider=provider.name, listing=listing)
+
     async def _ask(
         self, provider: Provider, query: SearchQuery, limit: int
     ) -> tuple[list[Listing], ProviderOutcome]:
@@ -137,6 +192,10 @@ class Bonneaffaire:
             if provider.recognises_native_url(url):
                 return [provider]
         raise UnrecognisedNativeUrl(url, [provider.name for provider in accepting])
+
+
+def _has_listing_details(provider: Provider) -> TypeIs[ListingDetailsProvider]:
+    return provider.capabilities.listing_details and isinstance(provider, ListingDetailsProvider)
 
 
 def sort_listings(listings: list[Listing], order: Sort) -> list[Listing]:

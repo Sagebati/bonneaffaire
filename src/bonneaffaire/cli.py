@@ -14,6 +14,9 @@ from bonneaffaire.models import (
     DEFAULT_LIMIT,
     Condition,
     FilterReport,
+    ListingDetails,
+    ListingRequest,
+    ListingStatus,
     Location,
     Money,
     SearchQuery,
@@ -99,7 +102,51 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
         else:
             print_table(result)
 
+    @app.command()
+    def listing(
+        target: Annotated[str, typer.Argument(help="A Listing URL, or a Provider name.")],
+        provider_id: Annotated[
+            str | None, typer.Argument(help="The Provider ID, when TARGET is a Provider.")
+        ] = None,
+        as_json: Annotated[bool, typer.Option("--json", help="Print JSON.")] = False,
+    ) -> None:
+        """Get one Listing's full details."""
+        if target.startswith(("http://", "https://")):
+            request = ListingRequest(url=target)
+        elif provider_id is None:
+            raise typer.BadParameter("give a Provider ID after the Provider name")
+        else:
+            request = ListingRequest(provider=target, provider_id=provider_id)
+        result = asyncio.run(core_factory().get_listing(request))
+        if as_json:
+            typer.echo(result.model_dump_json(indent=2))
+        elif result.listing is not None:
+            print_details(result.listing)
+        if result.status != ListingStatus.OK:
+            reason = "Listing not found" if result.status == ListingStatus.NOT_FOUND else "Failed"
+            typer.echo(f"{reason} ({result.status}): {result.message}", err=True)
+            raise typer.Exit(1)
+
     return app
+
+
+def print_details(details: ListingDetails) -> None:
+    table = Table(show_header=False, box=None)
+    rows = {
+        "Provider": f"{details.provider} {details.provider_id}",
+        "Title": details.title,
+        "URL": details.url,
+        "Price": str(details.price),
+        "Condition": f"{details.condition} ({details.condition_label or '-'})",
+        "Seller": f"{details.seller.name if details.seller else '-'} ({details.seller_kind})",
+        "Availability": details.availability or "-",
+        "Description": details.description or "-",
+        "Photos": "\n".join(details.photos) or "-",
+        **{key: str(value) for key, value in details.attributes.items()},
+    }
+    for key, value in rows.items():
+        table.add_row(key, value)
+    Console().print(table)
 
 
 def query_from_arguments(arguments: list[str]) -> SearchQuery:
