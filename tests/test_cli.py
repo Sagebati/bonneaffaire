@@ -207,3 +207,16 @@ def test_an_unrecognised_native_url_is_reported_and_exits_non_zero():
     assert result.exit_code == 1
     assert "no Provider recognises the Native URL https://elsewhere.example/x" in result.output
     assert provider.asked == []
+
+
+def test_a_native_url_with_filters_is_rejected():
+    provider = FakeUrlProvider()
+    app = make_app(lambda: Bonneaffaire([provider]))
+
+    result = CliRunner().invoke(
+        app, ["search", "https://fake.example/recherche/disque/", "--max-price", "100"]
+    )
+
+    assert result.exit_code == 2
+    assert "Native URL is the whole Search" in result.output
+    assert provider.asked == []

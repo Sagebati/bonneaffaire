@@ -81,8 +81,8 @@ def make_server(core_factory: Callable[[], Bonneaffaire] = default_core) -> MCPS
                 description=(
                     "A Native URL: a search page address copied from a Provider's own website. "
                     "It is the whole Search request and goes only to the Provider it belongs to "
-                    "(see native_urls in list_providers). Give keywords or native_url, not both; "
-                    "Filters are not combined with a Native URL."
+                    "(see native_urls in list_providers). Give keywords or native_url, not both. "
+                    "A Native URL takes no Filters or extras: set them on the website."
                 )
             ),
         ] = None,
@@ -168,15 +168,15 @@ def make_server(core_factory: Callable[[], Bonneaffaire] = default_core) -> MCPS
         """
         try:
             request = SearchRequest(
-                query=SearchQuery(
+                query=SearchQuery.build(
                     keywords=keywords,
                     native_url=native_url,
                     price_min=price_min,
                     price_max=price_max,
-                    conditions=frozenset(conditions or ()),
+                    conditions=conditions,
                     location=location,
                     sort=sort,
-                    extras=extras or {},
+                    extras=extras,
                 ),
                 limit=limit,
                 providers=frozenset(providers) if providers else None,

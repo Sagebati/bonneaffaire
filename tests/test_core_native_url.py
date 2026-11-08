@@ -6,11 +6,13 @@ from bonneaffaire.core import Bonneaffaire, UnrecognisedNativeUrl
 from bonneaffaire.models import (
     Condition,
     Listing,
+    Location,
     Money,
     OutcomeStatus,
     SearchQuery,
     SearchRequest,
     SellerKind,
+    Sort,
 )
 from bonneaffaire.providers import Capabilities
 
@@ -101,3 +103,19 @@ def test_a_search_query_takes_keywords_or_a_native_url_but_not_both():
         SearchQuery(keywords="disque", native_url="https://alpha.example/x")
     with pytest.raises(ValueError, match="keywords or a Native URL"):
         SearchQuery()
+
+
+@pytest.mark.parametrize(
+    "filters",
+    [
+        {"price_min": Money(cents=1000, currency="EUR")},
+        {"price_max": Money(cents=1000, currency="EUR")},
+        {"conditions": frozenset({Condition.NEW})},
+        {"location": Location(place="Lyon")},
+        {"sort": Sort.PRICE},
+        {"extras": {"alpha": {"category": "informatique"}}},
+    ],
+)
+def test_a_native_url_takes_no_filters(filters):
+    with pytest.raises(ValueError, match="Native URL is the whole Search"):
+        SearchQuery(native_url="https://alpha.example/x", **filters)

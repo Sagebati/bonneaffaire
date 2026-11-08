@@ -160,6 +160,17 @@ async def test_bad_search_requests_are_tool_errors():
     assert neither.is_error
 
 
+async def test_a_native_url_with_filters_is_a_tool_error():
+    shop = FakeShop()
+    async with Client(make_server(lambda: Bonneaffaire([shop]))) as client:
+        result = await client.call_tool(
+            "search", {"native_url": "https://shop.example/search?q=disque", "sort": "price"}
+        )
+
+    assert result.is_error and "Native URL is the whole Search" in text(result)
+    assert shop.asked == []
+
+
 async def test_get_listing_by_provider_id_or_url():
     async with Client(make_server(lambda: Bonneaffaire([FakeShop()]))) as client:
         by_id = await client.call_tool("get_listing", {"provider": "shop", "provider_id": "PB1"})

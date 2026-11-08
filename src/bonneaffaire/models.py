@@ -1,5 +1,6 @@
 """The shared vocabulary: Listings, Search requests and results (see GLOSSARY.md)."""
 
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from enum import StrEnum
 from typing import Any
@@ -170,10 +171,42 @@ class SearchQuery(BaseModel):
     sort: Sort | None = None
     extras: dict[str, dict[str, str]] = Field(default_factory=dict)
 
+    @classmethod
+    def build(
+        cls,
+        *,
+        keywords: str | None = None,
+        native_url: str | None = None,
+        price_min: Money | None = None,
+        price_max: Money | None = None,
+        conditions: Iterable[Condition] | None = None,
+        location: Location | None = None,
+        sort: Sort | None = None,
+        extras: Mapping[str, Mapping[str, str]] | None = None,
+    ) -> SearchQuery:
+        """The one way adapters build a query from their arguments: absent collections are
+        empty, and every rule (keywords or Native URL, no Filters with a Native URL) holds."""
+        return cls(
+            keywords=keywords,
+            native_url=native_url,
+            price_min=price_min,
+            price_max=price_max,
+            conditions=frozenset(conditions or ()),
+            location=location,
+            sort=sort,
+            extras={provider: dict(values) for provider, values in (extras or {}).items()},
+        )
+
     @model_validator(mode="after")
     def _keywords_or_native_url(self) -> SearchQuery:
         if (self.keywords is None) == (self.native_url is None):
             raise ValueError("a Search takes keywords or a Native URL, exactly one of them")
+        if self.native_url is not None and (self.filters_set() or self.extras):
+            given = [str(name) for name in self.filters_set()] + (["extras"] if self.extras else [])
+            raise ValueError(
+                "a Native URL is the whole Search: it takes no Filters or extras "
+                f"(got {', '.join(given)}); set them on the Provider's website instead"
+            )
         return self
 
     def filters_set(self) -> list[FilterName]:

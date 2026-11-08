@@ -7,6 +7,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Annotated
 
 import typer
+from pydantic import ValidationError
 from rich.console import Console
 from rich.table import Table
 
@@ -91,16 +92,25 @@ def make_app(
         """Search for Listings by keywords, or by a Native URL from a Provider's website."""
         if radius_km is not None and near is None:
             raise typer.BadParameter("needs --near", param_hint="--radius-km")
-        filters = {
-            "price_min": parse_euros(min_price, "--min-price"),
-            "price_max": parse_euros(max_price, "--max-price"),
-            "conditions": frozenset(condition or ()),
-            "location": Location(place=near, radius_km=radius_km) if near else None,
-            "sort": sort,
-            "extras": parse_extras(extra or []),
-        }
+        native_url = native_url_argument(keywords)
+        try:
+            query = SearchQuery.build(
+                keywords=None if native_url else " ".join(keywords),
+                native_url=native_url,
+                price_min=parse_euros(min_price, "--min-price"),
+                price_max=parse_euros(max_price, "--max-price"),
+                conditions=condition,
+                location=Location(place=near, radius_km=radius_km) if near else None,
+                sort=sort,
+                extras=parse_extras(extra or []),
+            )
+        except ValidationError as exc:
+            messages = "; ".join(
+                error["msg"].removeprefix("Value error, ") for error in exc.errors()
+            )
+            raise typer.BadParameter(messages) from exc
         request = SearchRequest(
-            query=query_from_arguments(keywords).model_copy(update=filters),
+            query=query,
             limit=limit,
             providers=frozenset(providers) if providers else None,
         )
@@ -214,11 +224,11 @@ def print_details(details: ListingDetails) -> None:
     Console().print(table)
 
 
-def query_from_arguments(arguments: list[str]) -> SearchQuery:
+def native_url_argument(arguments: list[str]) -> str | None:
     """A single http(s) argument is a Native URL; anything else is keywords."""
     if len(arguments) == 1 and arguments[0].startswith(("http://", "https://")):
-        return SearchQuery(native_url=arguments[0])
-    return SearchQuery(keywords=" ".join(arguments))
+        return arguments[0]
+    return None
 
 
 def parse_euros(text: str | None, option: str) -> Money | None:
