@@ -8,6 +8,7 @@ from bonneaffaire.politeness import Politeness
 from bonneaffaire.providers import Provider
 from bonneaffaire.providers.ebay import EbayCredentials, ebay
 from bonneaffaire.providers.ldlc import ldlc
+from bonneaffaire.providers.leboncoin import leboncoin
 
 DISABLED_PROVIDERS_VARIABLE = "BONNEAFFAIRE_DISABLED_PROVIDERS"
 EBAY_CLIENT_ID_VARIABLE = "BONNEAFFAIRE_EBAY_CLIENT_ID"
@@ -34,7 +35,7 @@ def default_providers(
         unavailable["ebay"] = (
             f"no eBay credentials: set {EBAY_CLIENT_ID_VARIABLE} and {EBAY_CLIENT_SECRET_VARIABLE}"
         )
-    return [ldlc(), ebay(credentials)], unavailable
+    return [ldlc(), leboncoin(), ebay(credentials)], unavailable
 
 
 def default_core(environ: Mapping[str, str] = os.environ) -> Bonneaffaire:

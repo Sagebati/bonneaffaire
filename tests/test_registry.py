@@ -36,11 +36,12 @@ def test_providers_switched_off_in_configuration_say_so():
 
 
 async def test_a_search_without_ebay_credentials_still_runs_the_other_providers():
-    core = default_core({"BONNEAFFAIRE_DISABLED_PROVIDERS": "ldlc"})
+    others = [info.name for info in default_core({}).list_providers() if info.name != "ebay"]
+    core = default_core({"BONNEAFFAIRE_DISABLED_PROVIDERS": ",".join(others)})
 
     result = await core.search(SearchRequest(query=SearchQuery(keywords="nas")))
 
-    assert result.outcomes == []
+    assert result.outcomes == [], "eBay without credentials is not asked, so nothing fails"
 
 
 async def test_asking_a_disabled_provider_explains_why():
