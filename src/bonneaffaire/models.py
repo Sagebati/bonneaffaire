@@ -232,6 +232,24 @@ class FilterReport(BaseModel):
     ignored_extras: list[str] = Field(default_factory=list)
 
 
+class ProviderInfo(BaseModel):
+    """One Provider as List Providers shows it: what it supports and whether it is enabled.
+
+    native_filters: canonical Filters it applies itself; the core applies the others locally.
+    native_urls: whether a Search can take a Native URL copied from its website.
+    listing_details: whether Get Listing works for its Listings.
+    extras: names of the Provider-specific extras it accepts.
+    """
+
+    name: str
+    country: str
+    enabled: bool
+    native_filters: list[FilterName]
+    native_urls: bool
+    listing_details: bool
+    extras: list[str]
+
+
 class SearchResult(BaseModel):
     listings: list[Listing]
     outcomes: list[ProviderOutcome]

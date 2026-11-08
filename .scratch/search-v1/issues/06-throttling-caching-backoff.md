@@ -9,8 +9,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] Concurrent Searches never exceed a Provider's configured request rate
-- [ ] A repeated identical Search within the cache window makes no Provider requests and returns the same result
-- [ ] The cache window and per-Provider rates are configurable
-- [ ] After a blocked outcome, the next Searches skip that Provider until the backoff expires, and report blocked meanwhile
-- [ ] Tested at the core seam with fake Providers and a controllable clock
+- [x] Concurrent Searches never exceed a Provider's configured request rate
+- [x] A repeated identical Search within the cache window makes no Provider requests and returns the same result
+- [x] The cache window and per-Provider rates are configurable
+- [x] After a blocked outcome, the next Searches skip that Provider until the backoff expires, and report blocked meanwhile
+- [x] Tested at the core seam with fake Providers and a controllable clock
