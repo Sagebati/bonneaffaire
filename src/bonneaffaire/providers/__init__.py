@@ -3,7 +3,12 @@
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
 
-from bonneaffaire.models import Listing, ListingDetails, SearchQuery
+from bonneaffaire.models import FilterName, Listing, ListingDetails, SearchQuery
+
+HTTP_BLOCKED_STATUSES = frozenset({403, 429, 503})
+"""HTTP statuses that mean the Provider refused us (anti-bot challenge, rate limit)."""
+HTTP_GONE_STATUSES = frozenset({404, 410})
+"""HTTP statuses that mean the Listing asked for does not exist (any more)."""
 
 
 @dataclass(frozen=True)
@@ -16,7 +21,7 @@ class Capabilities:
     extras: Provider-specific extras it accepts (ticket 03).
     """
 
-    native_filters: frozenset[str] = field(default_factory=frozenset)
+    native_filters: frozenset[FilterName] = field(default_factory=frozenset)
     native_urls: bool = False
     listing_details: bool = False
     extras: frozenset[str] = field(default_factory=frozenset)
@@ -86,6 +91,8 @@ class ListingNotFound(ProviderError):
 
 
 __all__ = [
+    "HTTP_BLOCKED_STATUSES",
+    "HTTP_GONE_STATUSES",
     "Capabilities",
     "ListingDetailsProvider",
     "ListingNotFound",

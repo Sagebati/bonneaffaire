@@ -29,6 +29,8 @@ from bonneaffaire.models import (
     SellerKind,
 )
 from bonneaffaire.providers import (
+    HTTP_BLOCKED_STATUSES,
+    HTTP_GONE_STATUSES,
     Capabilities,
     ListingNotFound,
     ProviderBlocked,
@@ -37,8 +39,6 @@ from bonneaffaire.providers import (
     UnexpectedShape,
 )
 
-BLOCKED_STATUSES = frozenset({403, 429, 503})
-GONE_STATUSES = frozenset({404, 410})
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/130.0 Safari/537.36"
@@ -148,7 +148,7 @@ class RetailProvider:
             raise ProviderError(self.name, "this Provider has no Listing details")
         url = self.config.product_url.format(provider_id=quote(provider_id, safe=""))
         response = await self._get(url)
-        if response.status_code in GONE_STATUSES:
+        if response.status_code in HTTP_GONE_STATUSES:
             raise ListingNotFound(self.name, f"no Listing {provider_id}")
         self._raise_for_status(response, url)
         product = find_json_ld_product(response.text)
@@ -205,7 +205,7 @@ class RetailProvider:
         return response.text
 
     def _raise_for_status(self, response: httpx.Response, url: str) -> None:
-        if response.status_code in BLOCKED_STATUSES:
+        if response.status_code in HTTP_BLOCKED_STATUSES:
             raise ProviderBlocked(self.name, f"HTTP {response.status_code} from {url}")
         if response.status_code != 200:
             raise ProviderError(self.name, f"HTTP {response.status_code} from {url}")
@@ -335,8 +335,8 @@ def json_ld_attributes(product: dict[str, Any]) -> dict[str, Any]:
         "mpn": product.get("mpn"),
         "sku": product.get("sku"),
         "brand": brand.get("name") if isinstance(brand, dict) else brand,
-        "rating": _number(rating.get("ratingValue")),
-        "review_count": _whole_number(rating.get("reviewCount") or rating.get("ratingCount")),
+        "rating": _json_number(rating.get("ratingValue")),
+        "review_count": _json_whole_number(rating.get("reviewCount") or rating.get("ratingCount")),
     }
     return {key: value for key, value in candidates.items() if value not in (None, "")}
 
@@ -359,12 +359,12 @@ def _decimal(value: object) -> Decimal | None:
     return amount if amount.is_finite() else None
 
 
-def _number(value: object) -> float | None:
+def _json_number(value: object) -> float | None:
     amount = _decimal(value)
     return float(amount) if amount is not None else None
 
 
-def _whole_number(value: object) -> int | None:
+def _json_whole_number(value: object) -> int | None:
     amount = _decimal(value)
     return int(amount) if amount is not None else None
 

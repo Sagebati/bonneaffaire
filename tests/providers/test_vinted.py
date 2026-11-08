@@ -169,8 +169,13 @@ async def test_a_blocked_landing_page_is_reported_as_blocked():
     assert len(replay.requests) == 1, "a blocked session fetch is not retried"
 
 
-async def test_a_blocked_search_is_reported_as_blocked():
-    replay = Replay({SEARCH_ENDPOINT: blocked})
+def unavailable() -> httpx.Response:
+    return httpx.Response(503, text="<html>Service temporarily unavailable</html>")
+
+
+@pytest.mark.parametrize("route", [blocked, unavailable])
+async def test_a_blocked_search_is_reported_as_blocked(route):
+    replay = Replay({SEARCH_ENDPOINT: route})
     provider = vinted(transport=replay.transport())
 
     with pytest.raises(ProviderBlocked):

@@ -29,6 +29,8 @@ from bonneaffaire.models import (
     Sort,
 )
 from bonneaffaire.providers import (
+    HTTP_BLOCKED_STATUSES,
+    HTTP_GONE_STATUSES,
     Capabilities,
     ListingNotFound,
     ProviderBlocked,
@@ -82,9 +84,6 @@ NATIVE_URL_PARAMS = {
     "order": "order",
 }
 """Website catalog URL parameters and the `svc-catalogue` parameters they become."""
-
-BLOCKED_STATUSES = frozenset({403, 429})
-GONE_STATUSES = frozenset({404, 410})
 
 
 class StatusWatch(httpx.AsyncBaseTransport):
@@ -208,9 +207,9 @@ class VintedProvider:
             raise ProviderError(NAME, f"HTTP failure: {exc!r}") from exc
         except RuntimeError as exc:
             status = self._watch.last_status
-            if status in BLOCKED_STATUSES:
+            if status in HTTP_BLOCKED_STATUSES:
                 raise ProviderBlocked(NAME, f"refused with HTTP {status}") from exc
-            if status in GONE_STATUSES:
+            if status in HTTP_GONE_STATUSES:
                 raise ListingNotFound(NAME, f"HTTP {status}") from exc
             raise UnexpectedShape(NAME, str(exc)) from exc
 
