@@ -28,6 +28,8 @@ LDLC = RetailSite(
             "offer_id": Pick(":self", "data-offer-id"),
         },
     ),
+    native_url_hosts=frozenset({"www.ldlc.com", "ldlc.com"}),
+    native_url_path_prefix="/recherche/",
 )
 
 

@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] Providers declare whether they accept Native URLs and how to recognise their own
-- [ ] Pasting an LDLC search URL into the CLI returns the same Listings as the equivalent keyword Search
-- [ ] A Native URL is routed only to the Provider that recognises it
-- [ ] An unrecognised URL returns a clear error naming the problem
-- [ ] Tested at the core seam with fake Providers, plus an LDLC fixture test for URL parsing
+- [x] Providers declare whether they accept Native URLs and how to recognise their own
+- [x] Pasting an LDLC search URL into the CLI returns the same Listings as the equivalent keyword Search
+- [x] A Native URL is routed only to the Provider that recognises it
+- [x] An unrecognised URL returns a clear error naming the problem
+- [x] Tested at the core seam with fake Providers, plus an LDLC fixture test for URL parsing

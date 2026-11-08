@@ -8,7 +8,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from bonneaffaire.core import Bonneaffaire
+from bonneaffaire.core import Bonneaffaire, UnknownProvider, UnrecognisedNativeUrl
 from bonneaffaire.models import (
     DEFAULT_LIMIT,
     ListingDetails,
@@ -17,8 +17,8 @@ from bonneaffaire.models import (
     SearchQuery,
     SearchRequest,
     SearchResult,
+    Sort,
 )
-from bonneaffaire.providers import ProviderError
 from bonneaffaire.registry import default_core
 
 
@@ -31,17 +31,35 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
 
     @app.command()
     def search(
-        keywords: Annotated[list[str], typer.Argument(help="What to look for.")],
+        keywords: Annotated[
+            list[str],
+            typer.Argument(help="What to look for, or a Native URL copied from a Provider."),
+        ],
         limit: Annotated[
             int, typer.Option(min=1, help="Maximum Listings per Provider.")
         ] = DEFAULT_LIMIT,
+        providers: Annotated[
+            list[str] | None,
+            typer.Option(
+                "--provider", "-p", help="Ask only this Provider (repeatable). Default: all."
+            ),
+        ] = None,
+        sort: Annotated[
+            Sort | None, typer.Option(help="Sort merged Listings by price or recency.")
+        ] = None,
         as_json: Annotated[bool, typer.Option("--json", help="Print JSON.")] = False,
     ) -> None:
-        """Search for Listings."""
-        request = SearchRequest(query=SearchQuery(keywords=" ".join(keywords)), limit=limit)
+        """Search for Listings by keywords, or by a Native URL from a Provider's website."""
+        request = SearchRequest(
+            query=query_from_arguments(keywords).model_copy(update={"sort": sort}),
+            limit=limit,
+            providers=frozenset(providers) if providers else None,
+        )
         try:
             result = asyncio.run(core_factory().search(request))
-        except ProviderError as exc:
+        except UnknownProvider as exc:
+            raise typer.BadParameter(str(exc), param_hint="--provider") from exc
+        except UnrecognisedNativeUrl as exc:
             typer.echo(f"Search failed: {exc}", err=True)
             raise typer.Exit(1) from exc
         if as_json:
@@ -96,6 +114,13 @@ def print_details(details: ListingDetails) -> None:
     Console().print(table)
 
 
+def query_from_arguments(arguments: list[str]) -> SearchQuery:
+    """A single http(s) argument is a Native URL; anything else is keywords."""
+    if len(arguments) == 1 and arguments[0].startswith(("http://", "https://")):
+        return SearchQuery(native_url=arguments[0])
+    return SearchQuery(keywords=" ".join(arguments))
+
+
 def print_table(result: SearchResult) -> None:
     table = Table("Provider", "Price", "Condition", "Seller kind", "Title", "URL")
     for listing in result.listings:
@@ -110,7 +135,10 @@ def print_table(result: SearchResult) -> None:
     console = Console()
     console.print(table)
     for outcome in result.outcomes:
-        console.print(f"{outcome.provider}: {outcome.status} ({outcome.listing_count} Listings)")
+        line = f"{outcome.provider}: {outcome.status} ({outcome.listing_count} Listings)"
+        if outcome.message:
+            line += f" {outcome.message}"
+        console.print(line, markup=False, highlight=False)
 
 
 def main() -> None:

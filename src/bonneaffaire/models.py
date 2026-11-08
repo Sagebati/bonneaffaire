@@ -123,27 +123,45 @@ class ListingResult(BaseModel):
     message: str | None = None
 
 
-class SearchQuery(BaseModel):
-    """What one Provider is asked to search for.
+class Sort(StrEnum):
+    """How merged Listings are ordered: cheapest Price first, or newest first."""
 
-    Filters (ticket 03) and Native URLs (ticket 04) are added here.
+    PRICE = "price"
+    RECENCY = "recency"
+
+
+class SearchQuery(BaseModel):
+    """What one Provider is asked to search for: keywords, or a Native URL.
+
+    A Native URL is the whole Search request: it goes only to the Provider that recognises
+    it, which runs the search the URL describes. Filters (ticket 03) are added here.
+    sort: the core sorts merged Listings after merging; None keeps Provider order.
     """
 
     model_config = ConfigDict(frozen=True)
 
-    keywords: str
+    keywords: str | None = None
+    native_url: str | None = None
+    sort: Sort | None = None
+
+    @model_validator(mode="after")
+    def _keywords_or_native_url(self) -> SearchQuery:
+        if (self.keywords is None) == (self.native_url is None):
+            raise ValueError("a Search takes keywords or a Native URL, exactly one of them")
+        return self
 
 
 class SearchRequest(BaseModel):
-    """A Search as the caller asks it: the query and how many Listings per Provider.
+    """A Search as the caller asks it: the query, which Providers, how many Listings each.
 
-    Provider selection is added in ticket 02.
+    providers: names of the Providers to ask; None means every enabled Provider.
     """
 
     model_config = ConfigDict(frozen=True)
 
     query: SearchQuery
     limit: int = Field(default=DEFAULT_LIMIT, gt=0)
+    providers: frozenset[str] | None = None
 
 
 class OutcomeStatus(StrEnum):

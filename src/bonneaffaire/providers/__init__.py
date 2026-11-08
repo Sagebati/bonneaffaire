@@ -51,6 +51,15 @@ class ListingDetailsProvider(Provider, Protocol):
         ...
 
 
+@runtime_checkable
+class NativeUrlProvider(Provider, Protocol):
+    """A Provider that accepts Native URLs (and declares `capabilities.native_urls`)."""
+
+    def recognises_native_url(self, url: str) -> bool:
+        """Whether `url` is a search page address from this Provider's own website."""
+        ...
+
+
 class ProviderError(Exception):
     """Base for the typed failures a Provider signals; the core maps them to Provider outcomes."""
 
@@ -80,6 +89,7 @@ __all__ = [
     "Capabilities",
     "ListingDetailsProvider",
     "ListingNotFound",
+    "NativeUrlProvider",
     "Provider",
     "ProviderBlocked",
     "ProviderError",

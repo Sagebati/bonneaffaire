@@ -97,3 +97,55 @@ async def test_a_page_with_neither_cards_nor_a_no_results_notice_is_an_unexpecte
 
     with pytest.raises(UnexpectedShape):
         await provider.search(SearchQuery(keywords="disque dur 8 To"), limit=50)
+
+
+def test_ldlc_declares_that_it_accepts_native_urls():
+    assert ldlc().capabilities.native_urls is True
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://www.ldlc.com/recherche/disque%20dur%208%20To/",
+        "https://www.ldlc.com/recherche/disque dur/",
+        "http://ldlc.com/recherche/ssd/+fv121-19183.html",
+        "https://www.ldlc.com/recherche/ssd/page2/?sort=1#top",
+    ],
+)
+def test_ldlc_recognises_its_own_search_page_urls(url: str):
+    assert ldlc().recognises_native_url(url)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://www.ldlc.com/fiche/PB00281525.html",
+        "https://www.ldlc.com/",
+        "https://www.leboncoin.fr/recherche?text=disque",
+        "https://www.ldlc.com.evil.example/recherche/ssd/",
+        "ftp://www.ldlc.com/recherche/ssd/",
+        "not a url",
+    ],
+)
+def test_ldlc_does_not_recognise_other_urls(url: str):
+    assert not ldlc().recognises_native_url(url)
+
+
+async def test_a_native_url_returns_the_same_listings_as_the_equivalent_keyword_search():
+    provider = ldlc(client=replay({SEARCH_URL: SEARCH_PAGE}))
+
+    by_keywords = await provider.search(SearchQuery(keywords="disque dur 8 To"), limit=50)
+    by_url = await provider.search(SearchQuery(native_url=SEARCH_URL), limit=50)
+
+    assert by_url == by_keywords
+    assert len(by_url) == 19
+
+
+async def test_a_native_url_is_fetched_as_given_without_its_fragment():
+    filtered = "https://www.ldlc.com/recherche/disque%20dur%208%20To/+fv121-19183.html?sort=1"
+    provider = ldlc(client=replay({filtered: SEARCH_PAGE}))
+
+    listings = await provider.search(SearchQuery(native_url=f"{filtered}#listing"), limit=3)
+
+    assert len(listings) == 3
+    assert listings[0].provider_id == "PB00281525"
