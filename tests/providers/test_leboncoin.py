@@ -115,7 +115,7 @@ def edited_search(edit) -> str:
     return json.dumps(body)
 
 
-async def test_a_professional_seller_and_an_ad_without_condition():
+async def test_a_professional_seller_and_a_listing_without_condition():
     def professional_without_condition(ad):
         ad["owner"]["type"] = "pro"
         ad["attributes"] = [a for a in ad["attributes"] if a["key"] != "condition"]
@@ -131,7 +131,7 @@ async def test_a_professional_seller_and_an_ad_without_condition():
     assert first.condition_label is None
 
 
-async def test_a_for_parts_ad_maps_to_for_parts():
+async def test_a_for_parts_listing_maps_to_for_parts():
     def damaged(ad):
         for attribute in ad["attributes"]:
             if attribute["key"] == "condition":
@@ -262,7 +262,7 @@ async def test_an_unreadable_native_url_fails_without_asking_leboncoin():
     assert session.payloads() == []
 
 
-def test_listing_ids_come_from_leboncoin_ad_urls():
+def test_provider_ids_come_from_leboncoin_listing_urls():
     provider, _ = provider_answering({})
 
     assert provider.capabilities.listing_details
@@ -280,7 +280,7 @@ def test_listing_ids_come_from_leboncoin_ad_urls():
     assert provider.listing_id_from_url("https://www.ldlc.com/fiche/PB00281525.html") is None
 
 
-async def test_listing_details_come_from_the_ad_response():
+async def test_listing_details_come_from_the_details_response():
     provider, _ = provider_answering(
         {AD_URL.format(3299313803): Recorded(200, fixture("ad-3299313803.json"))}
     )

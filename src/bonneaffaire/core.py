@@ -204,7 +204,9 @@ class Bonneaffaire:
             status, message = _failure(exc, timeout)
             # A Search has no Listing to be missing: not found is that Provider's failure.
             return [], outcome(OUTCOME_STATUSES.get(status, OutcomeStatus.FAILED), message)
-        if not isinstance(answer, list) or not all(isinstance(i, Listing) for i in answer):
+        if not isinstance(answer, list) or not all(
+            isinstance(listing, Listing) for listing in answer
+        ):
             return [], outcome(OutcomeStatus.FAILED, "unexpected response shape")
         listings = answer[:limit]
         return listings, outcome(OutcomeStatus.OK, count=len(listings))
@@ -276,10 +278,10 @@ def sort_listings(listings: list[Listing], order: Sort) -> list[Listing]:
     """Price: cheapest first (cents compared as-is, never converted). Recency: newest first,
     undated last. Both are stable, so ties keep Provider order."""
     if order is Sort.PRICE:
-        return sorted(listings, key=lambda item: item.price.cents)
-    dated = [item for item in listings if item.posted_at is not None]
-    undated = [item for item in listings if item.posted_at is None]
-    return sorted(dated, key=lambda item: item.posted_at or 0, reverse=True) + undated
+        return sorted(listings, key=lambda listing: listing.price.cents)
+    dated = [listing for listing in listings if listing.posted_at is not None]
+    undated = [listing for listing in listings if listing.posted_at is None]
+    return sorted(dated, key=lambda listing: listing.posted_at or 0, reverse=True) + undated
 
 
 class UnknownProvider(ValueError):

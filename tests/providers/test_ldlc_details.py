@@ -23,7 +23,7 @@ def replay(pages: dict[str, httpx.Response]) -> httpx.AsyncClient:
     return httpx.AsyncClient(transport=httpx.MockTransport(handler))
 
 
-async def test_details_come_from_the_product_page_json_ld():
+async def test_details_come_from_the_listing_page_json_ld():
     provider = ldlc(client=replay({PRODUCT_URL: httpx.Response(200, text=PRODUCT_PAGE)}))
 
     details = await provider.get_listing("PB00281525")
@@ -86,14 +86,14 @@ async def test_a_removed_listing_redirecting_home_is_not_found():
         await provider.get_listing("PB99999999")
 
 
-async def test_a_404_product_page_is_not_found():
+async def test_a_404_listing_page_is_not_found():
     provider = ldlc(client=replay({}))
 
     with pytest.raises(ListingNotFound):
         await provider.get_listing("PB00281525")
 
 
-async def test_a_product_page_without_product_json_ld_is_an_unexpected_shape():
+async def test_a_listing_page_without_json_ld_is_an_unexpected_shape():
     broken = PRODUCT_PAGE.replace('"@type": "Product"', '"@type": "Thing"')
     provider = ldlc(client=replay({PRODUCT_URL: httpx.Response(200, text=broken)}))
 

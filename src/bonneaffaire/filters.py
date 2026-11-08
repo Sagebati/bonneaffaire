@@ -37,20 +37,22 @@ def apply_locally(
     listings: list[Listing], query: SearchQuery, report: FilterReport
 ) -> list[Listing]:
     """Keep the Listings that pass the Filters the report assigns to the core."""
-    return [item for item in listings if all(_passes(item, query, f) for f in report.local)]
+    return [
+        listing for listing in listings if all(_passes(listing, query, f) for f in report.local)
+    ]
 
 
-def _passes(item: Listing, query: SearchQuery, name: FilterName) -> bool:
+def _passes(listing: Listing, query: SearchQuery, name: FilterName) -> bool:
     match name:
         case FilterName.PRICE_MIN if query.price_min is not None:
-            return item.price.currency == query.price_min.currency and (
-                item.price.cents >= query.price_min.cents
+            return listing.price.currency == query.price_min.currency and (
+                listing.price.cents >= query.price_min.cents
             )
         case FilterName.PRICE_MAX if query.price_max is not None:
-            return item.price.currency == query.price_max.currency and (
-                item.price.cents <= query.price_max.cents
+            return listing.price.currency == query.price_max.currency and (
+                listing.price.cents <= query.price_max.cents
             )
         case FilterName.CONDITION:
-            return item.condition in query.conditions
+            return listing.condition in query.conditions
         case _:
             return True

@@ -175,7 +175,7 @@ async def test_listings_outside_the_condition_filter_are_dropped():
 ITEM_PATH = "/buy/browse/v1/item/v1|176345678901|0"
 
 
-async def test_listing_details_come_from_get_item():
+async def test_listing_details_come_from_the_details_endpoint():
     fake = FakeEbay({ITEM_PATH: answer(fixture("item-fr-176345678901.json"))})
     provider = ebay(CREDENTIALS, client=fake.client())
 
@@ -210,7 +210,7 @@ async def test_listing_details_come_from_get_item():
     assert fake.api_requests()[0].headers["X-EBAY-C-MARKETPLACE-ID"] == "EBAY_FR"
 
 
-async def test_the_documented_get_item_sample_parses():
+async def test_the_documented_details_sample_parses():
     sample = fixture("item-doc-sample.json")
     fake = FakeEbay({"/buy/browse/v1/item/v1|1**********0|0": answer(sample)})
     provider = ebay(CREDENTIALS, client=fake.client())
@@ -226,7 +226,7 @@ async def test_the_documented_get_item_sample_parses():
     assert details.photos == ["https://i.ebayimg.com/images/g/Z**********l/s-l1600.jpg"]
 
 
-async def test_an_ended_or_unknown_item_is_not_found():
+async def test_an_ended_or_unknown_listing_is_not_found():
     error = {"errors": [{"errorId": 11001, "message": "The specified item ID was not found."}]}
     fake = FakeEbay({ITEM_PATH: answer(error, status=404)})
     provider = ebay(CREDENTIALS, client=fake.client())
@@ -237,7 +237,7 @@ async def test_an_ended_or_unknown_item_is_not_found():
     assert "was not found" in raised.value.message
 
 
-def test_listing_urls_give_the_browse_item_id():
+def test_listing_urls_give_the_provider_id():
     provider = ebay(CREDENTIALS)
 
     assert provider.listing_id_from_url("https://www.ebay.fr/itm/176345678901") == (
