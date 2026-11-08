@@ -8,6 +8,7 @@ from bonneaffaire.models import DEFAULT_LIMIT
 from bonneaffaire.politeness import Politeness
 from bonneaffaire.providers import Provider
 from bonneaffaire.providers.ldlc import ldlc
+from bonneaffaire.providers.leboncoin import leboncoin
 
 DISABLED_PROVIDERS_VARIABLE = "BONNEAFFAIRE_DISABLED_PROVIDERS"
 RATE_VARIABLE = "BONNEAFFAIRE_RATE_PER_MINUTE"
@@ -23,7 +24,7 @@ DEFAULT_BACKOFF_SECONDS = 600.0
 
 
 def default_providers() -> list[Provider]:
-    return [ldlc()]
+    return [ldlc(), leboncoin()]
 
 
 def default_core(
