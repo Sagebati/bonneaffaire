@@ -259,6 +259,9 @@ class LeboncoinProvider:
         location = raw.get("location") or {}
         images = raw.get("images") or {}
         kept = _raw_attributes(raw, attributes)
+        shipping = _cheapest_shipping(raw.get("shipping_fees"))
+        shipping_types = (attributes.get("shipping_type") or {}).get("values") or []
+        offers_shipping = shipping is not None or any(t != "face_to_face" for t in shipping_types)
         kept.update({key: value for key, value in (extra_attributes or {}).items() if value})
         try:
             return Listing(
@@ -272,7 +275,8 @@ class LeboncoinProvider:
                 seller_kind=SELLER_KINDS.get(owner.get("type", ""), SellerKind.UNKNOWN),
                 location=location.get("city_label"),
                 thumbnail=images.get("thumb_url"),
-                shipping=_cheapest_shipping(raw.get("shipping_fees")),
+                shipping=shipping,
+                buyer_fee=_buyer_fee(raw.get("buyer_fee")) if offers_shipping else None,
                 posted_at=_paris_time(raw.get("first_publication_date")),
                 attributes=kept,
             )
@@ -303,6 +307,13 @@ def _cheapest_shipping(options: object) -> Money | None:
         if isinstance(option, dict) and isinstance(option.get("price"), int)
     ]
     return Money(cents=min(prices), currency=CURRENCY) if prices else None
+
+
+def _buyer_fee(fee: object) -> Money | None:
+    """The buyer fee Leboncoin states for an ad. Callers use it only for ads that offer
+    shipping: a hand-delivery-only sale is paid in person, so its Buyer fee stays unknown."""
+    amount = fee.get("amount") if isinstance(fee, dict) else None
+    return Money(cents=amount, currency=CURRENCY) if isinstance(amount, int) else None
 
 
 def _paris_time(text: object) -> datetime | None:

@@ -37,6 +37,7 @@ async def test_details_come_from_the_product_page_json_ld():
     assert details.condition_label == "Neuf"
     assert details.seller_kind == SellerKind.PROFESSIONAL
     assert details.availability == "InStock"
+    assert details.buyer_fee == Money(cents=0, currency="EUR")
     assert details.description is not None
     assert "8 To 7200 RPM 256 Mo Serial ATA 6 Gb/s pour NAS" in details.description
     assert details.photos == [

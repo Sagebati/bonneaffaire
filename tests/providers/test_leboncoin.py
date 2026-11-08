@@ -78,9 +78,20 @@ async def test_thumbnail_posting_time_and_raw_attributes_are_kept():
     assert first.attributes["brand"] == "Western Digital"
     assert first.attributes["condition_value"] == "etatneuf"
     assert first.attributes["zipcode"] == "69100"
-    # Leboncoin quotes a flat buyer fee in search results; kept raw, not trusted as Buyer fee.
     assert first.attributes["quoted_buyer_fee_cents"] == 199
-    assert first.buyer_fee is None
+
+
+async def test_the_stated_buyer_fee_counts_only_for_listings_that_offer_shipping():
+    provider, _ = provider_answering({SEARCH_URL: Recorded(200, SEARCH)})
+
+    listings = await provider.search(SearchQuery(keywords="disque dur 8 To"), limit=50)
+    by_id = {listing.provider_id: listing for listing in listings}
+
+    shipped = by_id["3299313803"]
+    assert shipped.buyer_fee == Money(cents=199, currency="EUR")
+    assert shipped.total_cost == Money(cents=25000 + 399 + 199, currency="EUR")
+    # Hand delivery only: no Buyer fee is charged through Leboncoin, so it stays unknown.
+    assert by_id["3279270463"].buyer_fee is None
 
 
 async def test_conditions_map_from_leboncoin_labels_and_keep_the_raw_label():

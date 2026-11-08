@@ -45,6 +45,8 @@ async def test_keyword_search_returns_listings_from_the_search_page():
     assert first.condition_label == "Neuf"
     assert first.seller_kind == SellerKind.PROFESSIONAL
     assert first.shipping is None
+    # A retailer charges no Buyer fee: a known zero, so only Shipping keeps Total cost unknown.
+    assert first.buyer_fee == Money(cents=0, currency="EUR")
     assert first.total_cost is None
     assert listings[-1].provider_id == "PB00699187"
     assert listings[-1].price == Money(cents=39995, currency="EUR")

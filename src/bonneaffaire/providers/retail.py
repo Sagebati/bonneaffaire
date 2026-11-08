@@ -4,6 +4,8 @@ A simple retail site is described by a RetailSite: how to build its search URL a
 CSS selectors pick Listings out of its server-rendered search page. If it also has a
 product page URL, Listing details are read from the schema.org Product/Offer JSON-LD that
 such pages carry, so a new retailer needs no details code of its own.
+
+Retailers charge no Buyer fee, so every retail Listing's Buyer fee is a known zero.
 """
 
 import json
@@ -179,6 +181,7 @@ class RetailProvider:
                 self.site.condition_label if condition == self.site.condition else condition_term
             ),
             seller_kind=self.site.seller_kind,
+            buyer_fee=Money(cents=0, currency=offer.get("priceCurrency") or self.site.currency),
             attributes=json_ld_attributes(product),
             description=product.get("description"),
             photos=photos,
@@ -247,6 +250,7 @@ class RetailProvider:
             condition=self.site.condition,
             condition_label=self.site.condition_label,
             seller_kind=self.site.seller_kind,
+            buyer_fee=Money(cents=0, currency=self.site.currency),
             attributes=attributes,
         )
 
