@@ -3,6 +3,8 @@
 Search goes through the library's `svc-catalogue` endpoint. Each Listing carries Vinted's
 buyer protection as its Buyer fee. Search results do not state Shipping, so Total cost is
 only known from Listing details, where the item page gives the cheapest delivery price.
+Search results carry no posting time either (no date field, and photos no timestamp), so
+Vinted Listings have no posted_at and sort after dated ones by recency.
 """
 
 import json

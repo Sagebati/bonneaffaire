@@ -209,6 +209,15 @@ def test_an_unrecognised_native_url_is_reported_and_exits_non_zero():
     assert provider.asked == []
 
 
+def test_a_recency_sorted_table_says_undated_listings_come_last():
+    app = make_app(lambda: Bonneaffaire([FakeProvider()]))
+
+    result = CliRunner().invoke(app, ["search", "disque", "--sort", "recency"])
+
+    assert result.exit_code == 0, result.output
+    assert "Listings from fake have no posting time and come after dated ones" in result.output
+
+
 def test_a_native_url_with_filters_is_rejected():
     provider = FakeUrlProvider()
     app = make_app(lambda: Bonneaffaire([provider]))

@@ -81,7 +81,13 @@ def make_app(
             int | None, typer.Option(min=1, help="Radius around --near, in km.")
         ] = None,
         sort: Annotated[
-            Sort | None, typer.Option(help="Sort merged Listings by price or recency.")
+            Sort | None,
+            typer.Option(
+                help=(
+                    "Sort merged Listings by price or recency. With recency, Listings from "
+                    "Providers without posting times (Vinted, LDLC) come after dated ones."
+                )
+            ),
         ] = None,
         extra: Annotated[
             list[str] | None,
@@ -124,7 +130,7 @@ def make_app(
         if as_json:
             typer.echo(result.model_dump_json(indent=2))
         else:
-            print_table(result)
+            print_table(result, sort)
 
     @app.command()
     def listing(
@@ -268,7 +274,7 @@ def describe_filters(report: FilterReport) -> str | None:
     return f"{report.provider} Filters: {'; '.join(parts)}" if parts else None
 
 
-def print_table(result: SearchResult) -> None:
+def print_table(result: SearchResult, sort: Sort | None = None) -> None:
     table = Table("Provider", "Price", "Condition", "Seller kind", "Title", "URL")
     for listing in result.listings:
         table.add_row(
@@ -289,6 +295,19 @@ def print_table(result: SearchResult) -> None:
     for report in result.filter_reports:
         if (line := describe_filters(report)) is not None:
             console.print(line, markup=False, highlight=False)
+    if sort is Sort.RECENCY and (line := describe_undated(result)) is not None:
+        console.print(line, markup=False, highlight=False, soft_wrap=True)
+
+
+def describe_undated(result: SearchResult) -> str | None:
+    """Which Providers' Listings a recency sort put last for lack of a posting time."""
+    undated = sorted({listing.provider for listing in result.listings if listing.posted_at is None})
+    if not undated:
+        return None
+    return (
+        f"Sorted by recency: Listings from {', '.join(undated)} have no posting time "
+        "and come after dated ones."
+    )
 
 
 def main() -> None:

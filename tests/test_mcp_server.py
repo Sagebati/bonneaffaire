@@ -212,6 +212,7 @@ async def test_search_schema_describes_filters_conditions_and_native_url():
         assert f'"{value}"' in schema
     for words in ("Native URL", "list_providers", "cents", "radius_km", "price", "recency"):
         assert words in schema
+    assert "without posting times (Vinted, LDLC) sort after dated ones" in schema
 
 
 async def test_an_mcp_client_calls_the_tools_over_streamable_http():

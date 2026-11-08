@@ -146,7 +146,8 @@ def make_server(core_factory: Callable[[], Bonneaffaire] = default_core) -> MCPS
             Field(
                 description=(
                     "Order of the merged Listings: 'price' (cheapest first) or 'recency' "
-                    "(newest first). Omit to keep Provider order."
+                    "(newest first). With recency, Listings from Providers without posting "
+                    "times (Vinted, LDLC) sort after dated ones. Omit to keep Provider order."
                 )
             ),
         ] = None,
