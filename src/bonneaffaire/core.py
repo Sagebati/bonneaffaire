@@ -8,6 +8,7 @@ from bonneaffaire.filters import apply_locally, plan
 from bonneaffaire.models import (
     FilterName,
     Listing,
+    ListingDetails,
     ListingRequest,
     ListingResult,
     ListingStatus,
@@ -19,6 +20,7 @@ from bonneaffaire.models import (
     SearchResult,
     Sort,
 )
+from bonneaffaire.politeness import Clock, Guard, Politeness, SystemClock
 from bonneaffaire.providers import (
     ListingDetailsProvider,
     ListingNotFound,
@@ -51,10 +53,14 @@ class Bonneaffaire:
         *,
         enabled: Iterable[str] | None = None,
         timeout: float = DEFAULT_TIMEOUT,
+        politeness: Politeness | None = None,
+        clock: Clock | None = None,
     ) -> None:
         """enabled: names of the Providers to keep; None keeps them all. Others are ignored.
 
-        timeout: seconds each Provider gets to answer one Search.
+        timeout: seconds each Provider gets to answer one Search (throttling waits excluded).
+        politeness: throttling, caching and backoff; the default switches them all off.
+        clock: time source for politeness; the system clock by default.
         """
         keep = None if enabled is None else set(enabled)
         self._all = list(providers)
@@ -64,6 +70,7 @@ class Bonneaffaire:
             if keep is None or provider.name in keep
         }
         self._timeout = timeout
+        self._guard = Guard(politeness or Politeness(), clock or SystemClock())
 
     @property
     def providers(self) -> list[Provider]:
@@ -144,9 +151,12 @@ class Bonneaffaire:
         def failure(status: ListingStatus, message: str) -> ListingResult:
             return ListingResult(status=status, provider=provider.name, message=message)
 
-        try:
+        async def fetch() -> ListingDetails:
             async with asyncio.timeout(self._timeout):
-                listing = await provider.get_listing(provider_id)
+                return await provider.get_listing(provider_id)
+
+        try:
+            listing = await self._guard.request(provider.name, fetch)
         except ListingNotFound as exc:
             return failure(ListingStatus.NOT_FOUND, exc.message)
         except ProviderBlocked as exc:
@@ -169,9 +179,12 @@ class Bonneaffaire:
                 provider=provider.name, status=status, listing_count=count, message=message
             )
 
-        try:
+        async def ask() -> list[Listing]:
             async with asyncio.timeout(self._timeout):
-                answer = await provider.search(query, limit)
+                return await provider.search(query, limit)
+
+        try:
+            answer = await self._guard.request(provider.name, ask, key=_cache_key(query, limit))
         except ProviderBlocked as exc:
             return [], outcome(OutcomeStatus.BLOCKED, exc.message)
         except ProviderTimeout as exc:
@@ -210,6 +223,12 @@ class Bonneaffaire:
             if provider.recognises_native_url(url):
                 return [provider]
         raise UnrecognisedNativeUrl(url, [provider.name for provider in accepting])
+
+
+def _cache_key(query: SearchQuery, limit: int) -> str:
+    """The normalised request one Provider is asked: the whole query it receives (keywords or
+    Native URL, Filters, sort, extras) and the limit. Each Provider caches its own answers."""
+    return f"{limit}:{query.model_dump_json()}"
 
 
 def _has_listing_details(provider: Provider) -> TypeIs[ListingDetailsProvider]:
