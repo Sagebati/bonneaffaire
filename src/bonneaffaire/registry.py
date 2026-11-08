@@ -3,7 +3,8 @@
 import os
 from collections.abc import Mapping
 
-from bonneaffaire.core import Bonneaffaire
+from bonneaffaire.core import DEFAULT_TIMEOUT, Bonneaffaire
+from bonneaffaire.models import DEFAULT_LIMIT
 from bonneaffaire.politeness import Politeness
 from bonneaffaire.providers import Provider
 from bonneaffaire.providers.ebay import EbayCredentials, ebay
@@ -17,6 +18,8 @@ RATE_VARIABLE = "BONNEAFFAIRE_RATE_PER_MINUTE"
 PROVIDER_RATES_VARIABLE = "BONNEAFFAIRE_PROVIDER_RATES"
 CACHE_VARIABLE = "BONNEAFFAIRE_CACHE_SECONDS"
 BACKOFF_VARIABLE = "BONNEAFFAIRE_BACKOFF_SECONDS"
+TIMEOUT_VARIABLE = "BONNEAFFAIRE_TIMEOUT_SECONDS"
+LIMIT_VARIABLE = "BONNEAFFAIRE_DEFAULT_LIMIT"
 
 DEFAULT_RATE_PER_MINUTE = 20.0
 DEFAULT_CACHE_SECONDS = 120.0
@@ -38,18 +41,26 @@ def default_providers(
     return [ldlc(), leboncoin(), ebay(credentials)], unavailable
 
 
-def default_core(environ: Mapping[str, str] = os.environ) -> Bonneaffaire:
+def default_core(
+    environ: Mapping[str, str] = os.environ, providers: list[Provider] | None = None
+) -> Bonneaffaire:
     """Build the core from configuration.
 
     BONNEAFFAIRE_DISABLED_PROVIDERS: comma-separated Provider names to switch off.
     BONNEAFFAIRE_EBAY_CLIENT_ID, BONNEAFFAIRE_EBAY_CLIENT_SECRET: the eBay application's
     production App ID and Cert ID; eBay is disabled without them.
+    BONNEAFFAIRE_TIMEOUT_SECONDS: seconds each Provider gets to answer (default 20).
+    BONNEAFFAIRE_DEFAULT_LIMIT: Listings per Provider when a Search names no limit (default 50).
     Politeness variables: see `politeness_from`.
+    providers: the known Providers; `default_providers(environ)` when None.
     """
     switched_off = {
         name.strip() for name in environ.get(DISABLED_PROVIDERS_VARIABLE, "").split(",")
     }
-    providers, disabled = default_providers(environ)
+    if providers is None:
+        providers, disabled = default_providers(environ)
+    else:
+        disabled = {}
     for provider in providers:
         if provider.name in switched_off:
             disabled[provider.name] = f"switched off in {DISABLED_PROVIDERS_VARIABLE}"
@@ -57,6 +68,10 @@ def default_core(environ: Mapping[str, str] = os.environ) -> Bonneaffaire:
         providers,
         enabled=[p.name for p in providers if p.name not in disabled],
         disabled=disabled,
+        timeout=_number(
+            TIMEOUT_VARIABLE, environ.get(TIMEOUT_VARIABLE), DEFAULT_TIMEOUT, positive=True
+        ),
+        default_limit=_whole_number(LIMIT_VARIABLE, environ.get(LIMIT_VARIABLE), DEFAULT_LIMIT),
         politeness=politeness_from(environ),
     )
 
@@ -103,4 +118,17 @@ def _number(
     if value < 0 or (positive and value == 0):
         bound = "positive" if positive else "zero or more"
         raise ValueError(f"{variable}: expected a number {bound}, got {raw!r}")
+    return value
+
+
+def _whole_number(variable: str, raw: str | None, default: int) -> int:
+    """A strictly positive integer, or `default` when unset."""
+    if raw is None or not raw.strip():
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        raise ValueError(f"{variable}: expected a whole number, got {raw!r}") from None
+    if value <= 0:
+        raise ValueError(f"{variable}: expected a whole number above zero, got {raw!r}")
     return value

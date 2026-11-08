@@ -13,6 +13,8 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import CallToolResult, TextContent
 from pydantic import BaseModel, Field, ValidationError
 from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from bonneaffaire.core import Bonneaffaire, UnknownProvider, UnrecognisedNativeUrl
 from bonneaffaire.models import (
@@ -94,8 +96,15 @@ def make_server(core_factory: Callable[[], Bonneaffaire] = default_core) -> MCPS
             ),
         ] = None,
         limit: Annotated[
-            int, Field(gt=0, description="Maximum Listings each Provider returns.")
-        ] = DEFAULT_LIMIT,
+            int | None,
+            Field(
+                gt=0,
+                description=(
+                    "Maximum Listings each Provider returns. "
+                    f"Omit for the configured default (normally {DEFAULT_LIMIT})."
+                ),
+            ),
+        ] = None,
         price_min: Annotated[
             Money | None,
             Field(
@@ -211,13 +220,19 @@ def make_server(core_factory: Callable[[], Bonneaffaire] = default_core) -> MCPS
             {"providers": [info.model_dump(mode="json") for info in core.list_providers()]}
         )
 
+    @server.custom_route("/health", methods=["GET"], include_in_schema=False)
+    async def health(request: Request) -> JSONResponse:
+        """Liveness for Docker's health check: the process answers HTTP. Providers are not
+        contacted, so a blocked Provider never marks the container unhealthy."""
+        return JSONResponse({"status": "ok", "enabled_providers": [p.name for p in core.providers]})
+
     return server
 
 
 def streamable_http_app(
     core_factory: Callable[[], Bonneaffaire] = default_core, *, host: str = DEFAULT_HOST
 ) -> Starlette:
-    """The ASGI app serving the MCP endpoint at /mcp.
+    """The ASGI app serving the MCP endpoint at /mcp and a health check at /health.
 
     host: the address it listens on. On localhost the SDK turns on DNS rebinding protection;
     on other addresses (e.g. 0.0.0.0 in Docker behind the Cloudflare Tunnel) it does not.

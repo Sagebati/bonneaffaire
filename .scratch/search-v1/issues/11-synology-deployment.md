@@ -11,7 +11,7 @@ No app-level auth. LAN access is open by decision.
 
 **Status:** ready-for-agent
 
-- [ ] The image builds for x86-64, and the compose file starts the MCP server with a persistent config
-- [ ] All settings listed in the spec can be set without rebuilding the image
-- [ ] Documentation covers Container Manager setup, the cloudflared tunnel, the Cloudflare Access application and service token, and an example agent configuration sending the Access headers
-- [ ] A health check shows the service is up
+- [x] The image builds for x86-64, and the compose file starts the MCP server with a persistent config
+- [x] All settings listed in the spec can be set without rebuilding the image
+- [x] Documentation covers Container Manager setup, the cloudflared tunnel, the Cloudflare Access application and service token, and an example agent configuration sending the Access headers
+- [x] A health check shows the service is up
