@@ -8,9 +8,8 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from bonneaffaire.core import Bonneaffaire
-from bonneaffaire.models import DEFAULT_LIMIT, SearchQuery, SearchRequest, SearchResult
-from bonneaffaire.providers import ProviderError
+from bonneaffaire.core import Bonneaffaire, UnknownProvider
+from bonneaffaire.models import DEFAULT_LIMIT, SearchQuery, SearchRequest, SearchResult, Sort
 from bonneaffaire.registry import default_core
 
 
@@ -27,15 +26,27 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
         limit: Annotated[
             int, typer.Option(min=1, help="Maximum Listings per Provider.")
         ] = DEFAULT_LIMIT,
+        providers: Annotated[
+            list[str] | None,
+            typer.Option(
+                "--provider", "-p", help="Ask only this Provider (repeatable). Default: all."
+            ),
+        ] = None,
+        sort: Annotated[
+            Sort | None, typer.Option(help="Sort merged Listings by price or recency.")
+        ] = None,
         as_json: Annotated[bool, typer.Option("--json", help="Print JSON.")] = False,
     ) -> None:
         """Search for Listings."""
-        request = SearchRequest(query=SearchQuery(keywords=" ".join(keywords)), limit=limit)
+        request = SearchRequest(
+            query=SearchQuery(keywords=" ".join(keywords), sort=sort),
+            limit=limit,
+            providers=frozenset(providers) if providers else None,
+        )
         try:
             result = asyncio.run(core_factory().search(request))
-        except ProviderError as exc:
-            typer.echo(f"Search failed: {exc}", err=True)
-            raise typer.Exit(1) from exc
+        except UnknownProvider as exc:
+            raise typer.BadParameter(str(exc), param_hint="--provider") from exc
         if as_json:
             typer.echo(result.model_dump_json(indent=2))
         else:
@@ -58,7 +69,10 @@ def print_table(result: SearchResult) -> None:
     console = Console()
     console.print(table)
     for outcome in result.outcomes:
-        console.print(f"{outcome.provider}: {outcome.status} ({outcome.listing_count} Listings)")
+        line = f"{outcome.provider}: {outcome.status} ({outcome.listing_count} Listings)"
+        if outcome.message:
+            line += f" {outcome.message}"
+        console.print(line, markup=False, highlight=False)
 
 
 def main() -> None:

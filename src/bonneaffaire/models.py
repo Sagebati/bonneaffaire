@@ -68,27 +68,37 @@ class Listing(BaseModel):
         return Money(cents=sum(part.cents for part in parts), currency=self.price.currency)
 
 
+class Sort(StrEnum):
+    """How merged Listings are ordered: cheapest Price first, or newest first."""
+
+    PRICE = "price"
+    RECENCY = "recency"
+
+
 class SearchQuery(BaseModel):
     """What one Provider is asked to search for.
 
     Filters (ticket 03) and Native URLs (ticket 04) are added here.
+    sort: the core sorts merged Listings after merging; None keeps Provider order.
     """
 
     model_config = ConfigDict(frozen=True)
 
     keywords: str
+    sort: Sort | None = None
 
 
 class SearchRequest(BaseModel):
-    """A Search as the caller asks it: the query and how many Listings per Provider.
+    """A Search as the caller asks it: the query, which Providers, how many Listings each.
 
-    Provider selection is added in ticket 02.
+    providers: names of the Providers to ask; None means every enabled Provider.
     """
 
     model_config = ConfigDict(frozen=True)
 
     query: SearchQuery
     limit: int = Field(default=DEFAULT_LIMIT, gt=0)
+    providers: frozenset[str] | None = None
 
 
 class OutcomeStatus(StrEnum):
