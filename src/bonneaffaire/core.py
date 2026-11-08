@@ -7,13 +7,32 @@ from bonneaffaire.models import (
     Listing,
     OutcomeStatus,
     ProviderOutcome,
+    SearchQuery,
     SearchRequest,
     SearchResult,
     Sort,
 )
-from bonneaffaire.providers import Provider, ProviderBlocked, ProviderError, ProviderTimeout
+from bonneaffaire.providers import (
+    NativeUrlProvider,
+    Provider,
+    ProviderBlocked,
+    ProviderError,
+    ProviderTimeout,
+)
 
 DEFAULT_TIMEOUT = 20.0
+
+
+class UnrecognisedNativeUrl(ValueError):
+    """No Provider recognises the Native URL a Search was given."""
+
+    def __init__(self, url: str, providers: list[str]) -> None:
+        accepting = ", ".join(providers) or "none"
+        super().__init__(
+            f"no Provider recognises the Native URL {url} "
+            f"(Providers accepting Native URLs: {accepting})"
+        )
+        self.url = url
 
 
 class Bonneaffaire:
@@ -46,7 +65,7 @@ class Bonneaffaire:
         A Provider that fails never fails the Search: it gets a non-ok Provider outcome and the
         other Providers' Listings are kept.
         """
-        providers = self._select(request.providers)
+        providers = self._providers_for(request.query, self._select(request.providers))
         answers = await asyncio.gather(*(self._ask(provider, request) for provider in providers))
         result = SearchResult(listings=[], outcomes=[])
         for listings, outcome in answers:
@@ -91,6 +110,22 @@ class Bonneaffaire:
         if unknown:
             raise UnknownProvider(sorted(unknown))
         return [provider for provider in self.providers if provider.name in names]
+
+    def _providers_for(self, query: SearchQuery, selected: list[Provider]) -> list[Provider]:
+        """Every selected Provider for a keyword Search; only the one that recognises a
+        Native URL."""
+        url = query.native_url
+        if url is None:
+            return selected
+        accepting = [
+            provider
+            for provider in selected
+            if provider.capabilities.native_urls and isinstance(provider, NativeUrlProvider)
+        ]
+        for provider in accepting:
+            if provider.recognises_native_url(url):
+                return [provider]
+        raise UnrecognisedNativeUrl(url, [provider.name for provider in accepting])
 
 
 def sort_listings(listings: list[Listing], order: Sort) -> list[Listing]:
