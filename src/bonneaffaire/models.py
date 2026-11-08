@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
 DEFAULT_LIMIT = 50
 
@@ -69,14 +69,22 @@ class Listing(BaseModel):
 
 
 class SearchQuery(BaseModel):
-    """What one Provider is asked to search for.
+    """What one Provider is asked to search for: keywords, or a Native URL.
 
-    Filters (ticket 03) and Native URLs (ticket 04) are added here.
+    A Native URL is the whole Search request: it goes only to the Provider that recognises
+    it, which runs the search the URL describes. Filters (ticket 03) are added here.
     """
 
     model_config = ConfigDict(frozen=True)
 
-    keywords: str
+    keywords: str | None = None
+    native_url: str | None = None
+
+    @model_validator(mode="after")
+    def _keywords_or_native_url(self) -> SearchQuery:
+        if (self.keywords is None) == (self.native_url is None):
+            raise ValueError("a Search takes keywords or a Native URL, exactly one of them")
+        return self
 
 
 class SearchRequest(BaseModel):

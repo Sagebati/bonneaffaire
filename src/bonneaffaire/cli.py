@@ -8,7 +8,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from bonneaffaire.core import Bonneaffaire
+from bonneaffaire.core import Bonneaffaire, UnrecognisedNativeUrl
 from bonneaffaire.models import DEFAULT_LIMIT, SearchQuery, SearchRequest, SearchResult
 from bonneaffaire.providers import ProviderError
 from bonneaffaire.registry import default_core
@@ -23,16 +23,22 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
 
     @app.command()
     def search(
-        keywords: Annotated[list[str], typer.Argument(help="What to look for.")],
+        keywords: Annotated[
+            list[str],
+            typer.Argument(help="What to look for, or a Native URL copied from a Provider."),
+        ],
         limit: Annotated[
             int, typer.Option(min=1, help="Maximum Listings per Provider.")
         ] = DEFAULT_LIMIT,
         as_json: Annotated[bool, typer.Option("--json", help="Print JSON.")] = False,
     ) -> None:
-        """Search for Listings."""
-        request = SearchRequest(query=SearchQuery(keywords=" ".join(keywords)), limit=limit)
+        """Search for Listings by keywords, or by a Native URL from a Provider's website."""
+        request = SearchRequest(query=query_from_arguments(keywords), limit=limit)
         try:
             result = asyncio.run(core_factory().search(request))
+        except UnrecognisedNativeUrl as exc:
+            typer.echo(f"Search failed: {exc}", err=True)
+            raise typer.Exit(1) from exc
         except ProviderError as exc:
             typer.echo(f"Search failed: {exc}", err=True)
             raise typer.Exit(1) from exc
@@ -42,6 +48,13 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
             print_table(result)
 
     return app
+
+
+def query_from_arguments(arguments: list[str]) -> SearchQuery:
+    """A single http(s) argument is a Native URL; anything else is keywords."""
+    if len(arguments) == 1 and arguments[0].startswith(("http://", "https://")):
+        return SearchQuery(native_url=arguments[0])
+    return SearchQuery(keywords=" ".join(arguments))
 
 
 def print_table(result: SearchResult) -> None:

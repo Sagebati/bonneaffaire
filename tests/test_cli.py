@@ -62,3 +62,33 @@ def test_search_prints_json_on_request():
         {"provider": "fake", "status": "ok", "listing_count": 1, "message": None}
     ]
     assert provider.asked[0][1] == 5
+
+
+class FakeUrlProvider(FakeProvider):
+    capabilities = Capabilities(native_urls=True)
+
+    def recognises_native_url(self, url: str) -> bool:
+        return url.startswith("https://fake.example/")
+
+
+def test_search_accepts_a_native_url_instead_of_keywords():
+    provider = FakeUrlProvider()
+    app = make_app(lambda: Bonneaffaire([provider]))
+
+    url = "https://fake.example/recherche/disque/"
+    result = CliRunner().invoke(app, ["search", url, "--json"])
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output)["listings"][0]["provider_id"] == "PB1"
+    assert provider.asked == [(SearchQuery(native_url=url), 50)]
+
+
+def test_an_unrecognised_native_url_is_reported_and_exits_non_zero():
+    provider = FakeUrlProvider()
+    app = make_app(lambda: Bonneaffaire([provider]))
+
+    result = CliRunner().invoke(app, ["search", "https://elsewhere.example/x"])
+
+    assert result.exit_code == 1
+    assert "no Provider recognises the Native URL https://elsewhere.example/x" in result.output
+    assert provider.asked == []
