@@ -135,7 +135,7 @@ class Bonneaffaire:
         return result
 
     async def get_listing(self, request: ListingRequest) -> ListingResult:
-        """Get one Listing's full details. Never raises ProviderErrors; reports a status."""
+        """Get one Listing's full details. A Provider failing never raises; it reports a status."""
         if request.url is not None:
             for provider in self.providers:
                 if not _has_listing_details(provider):
@@ -165,25 +165,15 @@ class Bonneaffaire:
     async def _get_listing(
         self, provider: ListingDetailsProvider, provider_id: str
     ) -> ListingResult:
-        def failure(status: ListingStatus, message: str) -> ListingResult:
-            return ListingResult(status=status, provider=provider.name, message=message)
-
         async def fetch() -> ListingDetails:
             async with asyncio.timeout(self._timeout):
                 return await provider.get_listing(provider_id)
 
         try:
             listing = await self._guard.request(provider.name, fetch)
-        except ListingNotFound as exc:
-            return failure(ListingStatus.NOT_FOUND, exc.message)
-        except ProviderBlocked as exc:
-            return failure(ListingStatus.BLOCKED, exc.message)
-        except ProviderTimeout as exc:
-            return failure(ListingStatus.TIMED_OUT, exc.message)
-        except TimeoutError:
-            return failure(ListingStatus.TIMED_OUT, f"no answer within {self._timeout}s")
-        except ProviderError as exc:
-            return failure(ListingStatus.FAILED, exc.message)
+        except Exception as exc:
+            status, message = _failure(exc, self._timeout)
+            return ListingResult(status=status, provider=provider.name, message=message)
         return ListingResult(status=ListingStatus.OK, provider=provider.name, listing=listing)
 
     async def _ask(
@@ -202,16 +192,10 @@ class Bonneaffaire:
 
         try:
             answer = await self._guard.request(provider.name, ask, key=_cache_key(query, limit))
-        except ProviderBlocked as exc:
-            return [], outcome(OutcomeStatus.BLOCKED, exc.message)
-        except ProviderTimeout as exc:
-            return [], outcome(OutcomeStatus.TIMED_OUT, exc.message)
-        except TimeoutError:
-            return [], outcome(OutcomeStatus.TIMED_OUT, f"no answer within {self._timeout}s")
-        except ProviderError as exc:
-            return [], outcome(OutcomeStatus.FAILED, exc.message)
-        except Exception as exc:  # any Provider bug is that Provider's failure
-            return [], outcome(OutcomeStatus.FAILED, f"{type(exc).__name__}: {exc}")
+        except Exception as exc:
+            status, message = _failure(exc, self._timeout)
+            # A Search has no Listing to be missing: not found is that Provider's failure.
+            return [], outcome(OUTCOME_STATUSES.get(status, OutcomeStatus.FAILED), message)
         if not isinstance(answer, list) or not all(isinstance(i, Listing) for i in answer):
             return [], outcome(OutcomeStatus.FAILED, "unexpected response shape")
         listings = answer[:limit]
@@ -240,6 +224,31 @@ class Bonneaffaire:
             if provider.recognises_native_url(url):
                 return [provider]
         raise UnrecognisedNativeUrl(url, [provider.name for provider in accepting])
+
+
+OUTCOME_STATUSES = {
+    ListingStatus.BLOCKED: OutcomeStatus.BLOCKED,
+    ListingStatus.TIMED_OUT: OutcomeStatus.TIMED_OUT,
+    ListingStatus.FAILED: OutcomeStatus.FAILED,
+}
+
+
+def _failure(exc: Exception, timeout: float) -> tuple[ListingStatus, str]:
+    """The status and message for anything a Provider raised. Any exception that is not a
+    ProviderError is a Provider bug, and so that Provider's failure, never the caller's."""
+    match exc:
+        case ListingNotFound():
+            return ListingStatus.NOT_FOUND, exc.message
+        case ProviderBlocked():
+            return ListingStatus.BLOCKED, exc.message
+        case ProviderTimeout():
+            return ListingStatus.TIMED_OUT, exc.message
+        case ProviderError():
+            return ListingStatus.FAILED, exc.message
+        case TimeoutError():
+            return ListingStatus.TIMED_OUT, f"no answer within {timeout}s"
+        case _:
+            return ListingStatus.FAILED, f"{type(exc).__name__}: {exc}"
 
 
 def _cache_key(query: SearchQuery, limit: int) -> str:

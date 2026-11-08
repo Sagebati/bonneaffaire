@@ -41,7 +41,7 @@ class DetailsProvider:
     country = "FR"
     capabilities = Capabilities(listing_details=True)
 
-    def __init__(self, error: ProviderError | None = None) -> None:
+    def __init__(self, error: Exception | None = None) -> None:
         self.error = error
         self.asked: list[str] = []
 
@@ -141,6 +141,16 @@ async def test_other_provider_errors_become_a_status(error, status):
 
     assert result.status == status
     assert result.message == error.message
+
+
+async def test_an_unexpected_exception_from_a_provider_is_a_failure():
+    core = Bonneaffaire([DetailsProvider(error=KeyError("price"))])
+
+    result = await core.get_listing(ListingRequest(provider="shop", provider_id="P1"))
+
+    assert result.status == ListingStatus.FAILED
+    assert result.provider == "shop"
+    assert result.message == "KeyError: 'price'"
 
 
 def test_a_request_needs_a_url_or_a_provider_and_id():
