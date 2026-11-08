@@ -11,8 +11,8 @@ Results are compact, consistent JSON, including Provider outcomes and the Filter
 
 **Status:** ready-for-agent
 
-- [ ] An MCP client can call Search, Get Listing and List Providers over Streamable HTTP
-- [ ] Tool input schemas describe Filters, Condition values, Provider names and Native URL clearly enough for an agent to build valid requests
-- [ ] Search results include Listings, Provider outcomes and the Filter report as compact JSON
-- [ ] The CLI providers command shows the same capability information
-- [ ] One smoke test confirms the adapter calls the core and serialises results
+- [x] An MCP client can call Search, Get Listing and List Providers over Streamable HTTP
+- [x] Tool input schemas describe Filters, Condition values, Provider names and Native URL clearly enough for an agent to build valid requests
+- [x] Search results include Listings, Provider outcomes and the Filter report as compact JSON
+- [x] The CLI providers command shows the same capability information
+- [x] One smoke test confirms the adapter calls the core and serialises results

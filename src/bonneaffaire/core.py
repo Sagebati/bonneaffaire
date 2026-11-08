@@ -6,11 +6,13 @@ from typing import TypeIs
 
 from bonneaffaire.filters import apply_locally, plan
 from bonneaffaire.models import (
+    FilterName,
     Listing,
     ListingRequest,
     ListingResult,
     ListingStatus,
     OutcomeStatus,
+    ProviderInfo,
     ProviderOutcome,
     SearchQuery,
     SearchRequest,
@@ -55,9 +57,10 @@ class Bonneaffaire:
         timeout: seconds each Provider gets to answer one Search.
         """
         keep = None if enabled is None else set(enabled)
+        self._all = list(providers)
         self._providers = {
             provider.name: provider
-            for provider in providers
+            for provider in self._all
             if keep is None or provider.name in keep
         }
         self._timeout = timeout
@@ -65,6 +68,21 @@ class Bonneaffaire:
     @property
     def providers(self) -> list[Provider]:
         return list(self._providers.values())
+
+    def list_providers(self) -> list[ProviderInfo]:
+        """Every known Provider, enabled or not, with the capabilities it declares."""
+        return [
+            ProviderInfo(
+                name=provider.name,
+                country=provider.country,
+                enabled=provider.name in self._providers,
+                native_filters=[n for n in FilterName if n in provider.capabilities.native_filters],
+                native_urls=provider.capabilities.native_urls,
+                listing_details=provider.capabilities.listing_details,
+                extras=sorted(provider.capabilities.extras),
+            )
+            for provider in self._all
+        ]
 
     async def search(self, request: SearchRequest) -> SearchResult:
         """Run one Search: ask the selected Providers concurrently and merge what they return.
