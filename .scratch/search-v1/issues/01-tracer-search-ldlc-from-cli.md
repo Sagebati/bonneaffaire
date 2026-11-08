@@ -14,10 +14,10 @@ See spec: `.scratch/search-v1/spec.md`. Use GLOSSARY.md terms.
 
 **Status:** ready-for-agent
 
-- [ ] A CLI search command with keywords returns LDLC Listings, as a table by default and as JSON with a flag
-- [ ] Each Listing has Provider, Provider ID, title, URL, thumbnail, Price in integer cents plus currency, Condition (New) with the raw label, and Seller kind (Professional)
-- [ ] Total cost is present only when Price, Shipping and Buyer fee are all known
-- [ ] LDLC is defined through the generic retail Provider's configuration, not as a hand-written LDLC class
-- [ ] A fixture test feeds recorded LDLC search HTML to the Provider and asserts on the Listings produced
-- [ ] A live canary test for LDLC exists and does not run in the default test run
-- [ ] The default test run passes
+- [x] A CLI search command with keywords returns LDLC Listings, as a table by default and as JSON with a flag
+- [x] Each Listing has Provider, Provider ID, title, URL, thumbnail, Price in integer cents plus currency, Condition (New) with the raw label, and Seller kind (Professional)
+- [x] Total cost is present only when Price, Shipping and Buyer fee are all known
+- [x] LDLC is defined through the generic retail Provider's configuration, not as a hand-written LDLC class
+- [x] A fixture test feeds recorded LDLC search HTML to the Provider and asserts on the Listings produced
+- [x] A live canary test for LDLC exists and does not run in the default test run
+- [x] The default test run passes
