@@ -68,15 +68,59 @@ class Listing(BaseModel):
         return Money(cents=sum(part.cents for part in parts), currency=self.price.currency)
 
 
-class SearchQuery(BaseModel):
-    """What one Provider is asked to search for.
+class FilterName(StrEnum):
+    """The canonical Filters besides keywords, which every Provider takes natively."""
 
-    Filters (ticket 03) and Native URLs (ticket 04) are added here.
+    PRICE_MIN = "price_min"
+    PRICE_MAX = "price_max"
+    CONDITION = "condition"
+    LOCATION = "location"
+    SORT = "sort"
+
+
+class Sort(StrEnum):
+    RELEVANCE = "relevance"
+    PRICE_ASC = "price_asc"
+    PRICE_DESC = "price_desc"
+    NEWEST = "newest"
+
+
+class Location(BaseModel):
+    """Where to look: a place (city or postcode), optionally with a radius around it."""
+
+    model_config = ConfigDict(frozen=True)
+
+    place: str
+    radius_km: int | None = Field(default=None, gt=0)
+
+
+class SearchQuery(BaseModel):
+    """What one Provider is asked to search for: keywords plus the canonical Filters.
+
+    `extras` maps a Provider name to its Provider-specific extras; each Provider only ever
+    sees its own entry, and only the extras it declares. Native URLs (ticket 04) are added here.
     """
 
     model_config = ConfigDict(frozen=True)
 
     keywords: str
+    price_min: Money | None = None
+    price_max: Money | None = None
+    conditions: frozenset[Condition] = frozenset()
+    location: Location | None = None
+    sort: Sort | None = None
+    extras: dict[str, dict[str, str]] = Field(default_factory=dict)
+
+    def filters_set(self) -> list[FilterName]:
+        """The canonical Filters this query uses, in FilterName order."""
+        values = {
+            FilterName.PRICE_MIN: self.price_min,
+            FilterName.PRICE_MAX: self.price_max,
+            FilterName.CONDITION: self.conditions or None,
+            FilterName.LOCATION: self.location,
+            FilterName.SORT: self.sort,
+        }
+        return [name for name, value in values.items() if value is not None]
 
 
 class SearchRequest(BaseModel):
@@ -107,6 +151,22 @@ class ProviderOutcome(BaseModel):
     message: str | None = None
 
 
+class FilterReport(BaseModel):
+    """How one Provider's Listings were filtered during a Search.
+
+    native: Filters the Provider applied itself. local: Filters the core applied to the
+    Provider's fetched Listings. unapplied: Filters nobody could apply (e.g. location without
+    location data). ignored_extras: extras sent to this Provider that it does not declare.
+    """
+
+    provider: str
+    native: list[FilterName] = Field(default_factory=list)
+    local: list[FilterName] = Field(default_factory=list)
+    unapplied: list[FilterName] = Field(default_factory=list)
+    ignored_extras: list[str] = Field(default_factory=list)
+
+
 class SearchResult(BaseModel):
     listings: list[Listing]
     outcomes: list[ProviderOutcome]
+    filter_reports: list[FilterReport] = Field(default_factory=list)

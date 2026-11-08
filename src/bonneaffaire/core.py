@@ -2,6 +2,7 @@
 
 from collections.abc import Iterable
 
+from bonneaffaire.filters import apply_locally, plan, sort_merged
 from bonneaffaire.models import OutcomeStatus, ProviderOutcome, SearchRequest, SearchResult
 from bonneaffaire.providers import Provider
 
@@ -22,11 +23,15 @@ class Bonneaffaire:
         """
         result = SearchResult(listings=[], outcomes=[])
         for provider in self.providers:
-            listings = (await provider.search(request.query, request.limit))[: request.limit]
+            query, report = plan(provider.name, provider.capabilities, request.query)
+            result.filter_reports.append(report)
+            fetched = await provider.search(query, request.limit)
+            listings = apply_locally(fetched, request.query, report)[: request.limit]
             result.listings.extend(listings)
             result.outcomes.append(
                 ProviderOutcome(
                     provider=provider.name, status=OutcomeStatus.OK, listing_count=len(listings)
                 )
             )
+        result.listings = sort_merged(result.listings, request.query.sort)
         return result
