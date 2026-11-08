@@ -6,6 +6,9 @@ from bonneaffaire.core import Bonneaffaire
 from bonneaffaire.models import (
     Condition,
     Listing,
+    ListingDetails,
+    ListingRequest,
+    ListingStatus,
     Money,
     OutcomeStatus,
     SearchQuery,
@@ -141,3 +144,43 @@ async def test_a_blocked_provider_is_skipped_and_reported_blocked_until_its_back
     ]
     assert blocked.asked_at == [0.0, 300.0]
     assert "backing off" in str(during.outcomes[0].message)
+
+
+class DetailsProvider(RecordingProvider):
+    capabilities = Capabilities(listing_details=True)
+
+    def listing_id_from_url(self, url: str) -> str | None:
+        return None
+
+    async def get_listing(self, provider_id: str) -> ListingDetails:
+        self.asked_at.append(self.clock.now())
+        if self.blocked:
+            raise ProviderBlocked(self.name, "HTTP 403")
+        return ListingDetails(
+            provider=self.name,
+            provider_id=provider_id,
+            title="Disque",
+            url=f"https://fake.example/{provider_id}",
+            price=Money(cents=1000, currency="EUR"),
+            condition=Condition.USED,
+            seller_kind=SellerKind.PRIVATE,
+        )
+
+
+async def test_get_listing_shares_the_providers_throttle_and_backoff_with_search():
+    clock = FakeClock()
+    provider = DetailsProvider(clock)
+    core = Bonneaffaire(
+        [provider], politeness=Politeness(default_rate=60, backoff_seconds=300), clock=clock
+    )
+    details = ListingRequest(provider="fake", provider_id="PB1")
+
+    await asyncio.gather(core.search(search("disque")), core.get_listing(details))
+    provider.blocked = True
+    blocked = await core.get_listing(details)
+    provider.blocked = False
+    during = await core.search(search("ssd"))
+
+    assert provider.asked_at == [0.0, 1.0, 2.0]
+    assert blocked.status is ListingStatus.BLOCKED
+    assert during.outcomes[0].status is OutcomeStatus.BLOCKED

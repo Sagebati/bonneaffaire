@@ -6,7 +6,7 @@ from typer.testing import CliRunner
 
 from bonneaffaire.cli import make_app
 from bonneaffaire.core import Bonneaffaire
-from bonneaffaire.models import Condition, Listing, Money, SearchQuery, SellerKind
+from bonneaffaire.models import Condition, Listing, Location, Money, SearchQuery, SellerKind, Sort
 from bonneaffaire.providers import Capabilities, ProviderBlocked
 from bonneaffaire.registry import default_core
 
@@ -63,6 +63,73 @@ def test_search_prints_json_on_request():
         {"provider": "fake", "status": "ok", "listing_count": 1, "message": None}
     ]
     assert provider.asked[0][1] == 5
+
+
+def test_search_passes_every_filter_and_extras_to_the_core():
+    provider = FakeProvider()
+    app = make_app(lambda: Bonneaffaire([provider]))
+
+    result = CliRunner().invoke(
+        app,
+        [
+            "search",
+            "disque",
+            "--min-price",
+            "100",
+            "--max-price",
+            "450.50",
+            "--condition",
+            "New",
+            "--condition",
+            "LikeNew",
+            "--near",
+            "Lyon",
+            "--radius-km",
+            "20",
+            "--sort",
+            "price",
+            "--extra",
+            "fake.category=15",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    query = provider.asked[0][0]
+    assert query.price_min == Money(cents=10000, currency="EUR")
+    assert query.price_max == Money(cents=45050, currency="EUR")
+    assert query.conditions == {Condition.NEW, Condition.LIKE_NEW}
+    assert query.location == Location(place="Lyon", radius_km=20)
+    assert query.sort == Sort.PRICE
+    payload = json.loads(result.output)
+    assert payload["filter_reports"] == [
+        {
+            "provider": "fake",
+            "native": [],
+            "local": ["price_min", "price_max", "condition", "sort"],
+            "unapplied": ["location"],
+            "ignored_extras": ["category"],
+        }
+    ]
+
+
+def test_the_table_reports_how_each_provider_applied_the_filters():
+    app = make_app(lambda: Bonneaffaire([FakeProvider()]))
+
+    runner = CliRunner(env={"COLUMNS": "200"})
+    result = runner.invoke(app, ["search", "disque", "--max-price", "500", "--near", "Lyon"])
+
+    assert result.exit_code == 0, result.output
+    assert "fake Filters: local price_max; not applied location" in result.output
+
+
+def test_a_malformed_extra_is_rejected():
+    app = make_app(lambda: Bonneaffaire([FakeProvider()]))
+
+    result = CliRunner().invoke(app, ["search", "disque", "--extra", "category15"])
+
+    assert result.exit_code == 2
+    assert "provider.name=value" in result.output
 
 
 class BlockedProvider:

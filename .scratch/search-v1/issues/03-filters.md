@@ -6,9 +6,9 @@
 
 **Status:** ready-for-agent
 
-- [ ] A price range and Condition Filter exclude non-matching Listings, whether the Provider applies them natively or the core applies them locally
-- [ ] The response states, for each Provider, which Filters were applied natively and which locally
-- [ ] A Filter that can't be applied at all, natively or locally (e.g. location on a Provider with no location data), is reported rather than silently ignored
-- [ ] Provider-specific extras reach only the Provider that declares them
-- [ ] CLI options exist for every canonical Filter and for extras
-- [ ] Tested at the core Search seam with fake Providers that declare different native Filters
+- [x] A price range and Condition Filter exclude non-matching Listings, whether the Provider applies them natively or the core applies them locally
+- [x] The response states, for each Provider, which Filters were applied natively and which locally
+- [x] A Filter that can't be applied at all, natively or locally (e.g. location on a Provider with no location data), is reported rather than silently ignored
+- [x] Provider-specific extras reach only the Provider that declares them
+- [x] CLI options exist for every canonical Filter and for extras
+- [x] Tested at the core Search seam with fake Providers that declare different native Filters

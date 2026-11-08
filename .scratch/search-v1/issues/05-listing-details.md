@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] The CLI command fetches details for an LDLC Listing, by Provider plus ID and by URL
-- [ ] Details include description, photos, attributes (e.g. EAN) and availability where the Provider exposes them
-- [ ] A removed Listing returns not found, not a generic failure
-- [ ] Asking for details from a Provider without that capability returns a clear "unsupported" result
-- [ ] Fixture test against a recorded LDLC product page; core-seam test for not found and unsupported
+- [x] The CLI command fetches details for an LDLC Listing, by Provider plus ID and by URL
+- [x] Details include description, photos, attributes (e.g. EAN) and availability where the Provider exposes them
+- [x] A removed Listing returns not found, not a generic failure
+- [x] Asking for details from a Provider without that capability returns a clear "unsupported" result
+- [x] Fixture test against a recorded LDLC product page; core-seam test for not found and unsupported

@@ -15,3 +15,11 @@ async def test_ldlc_search_still_parses():
     assert all(listing.price.cents > 0 for listing in listings)
     assert all(listing.url.startswith("https://www.ldlc.com/fiche/") for listing in listings)
     assert {listing.condition for listing in listings} == {Condition.NEW}
+
+
+async def test_ldlc_listing_details_still_parse():
+    details = await ldlc().get_listing("PB00281525")
+
+    assert details.price.cents > 0
+    assert details.photos
+    assert details.attributes.get("ean")

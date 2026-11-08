@@ -14,6 +14,7 @@ LDLC = RetailSite(
     condition=Condition.NEW,
     condition_label="Neuf",
     seller_kind=SellerKind.PROFESSIONAL,
+    product_url="https://www.ldlc.com/fiche/{provider_id}.html",
     search_page=SearchPage(
         card="li.pdt-item",
         title=Pick(".pdt-desc h3 a"),

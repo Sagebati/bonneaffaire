@@ -2,9 +2,15 @@
 
 import asyncio
 from collections.abc import Iterable
+from typing import TypeIs
 
+from bonneaffaire.filters import apply_locally, plan
 from bonneaffaire.models import (
     Listing,
+    ListingDetails,
+    ListingRequest,
+    ListingResult,
+    ListingStatus,
     OutcomeStatus,
     ProviderOutcome,
     SearchQuery,
@@ -14,6 +20,8 @@ from bonneaffaire.models import (
 )
 from bonneaffaire.politeness import Clock, Guard, Politeness, SystemClock
 from bonneaffaire.providers import (
+    ListingDetailsProvider,
+    ListingNotFound,
     NativeUrlProvider,
     Provider,
     ProviderBlocked,
@@ -72,17 +80,79 @@ class Bonneaffaire:
         other Providers' Listings are kept.
         """
         providers = self._providers_for(request.query, self._select(request.providers))
-        answers = await asyncio.gather(*(self._ask(provider, request) for provider in providers))
-        result = SearchResult(listings=[], outcomes=[])
-        for listings, outcome in answers:
+        plans = [
+            plan(provider.name, provider.capabilities, request.query) for provider in providers
+        ]
+        answers = await asyncio.gather(
+            *(
+                self._ask(provider, query, request.limit)
+                for provider, (query, _) in zip(providers, plans, strict=True)
+            )
+        )
+        result = SearchResult(listings=[], outcomes=[], filter_reports=[r for _, r in plans])
+        for (listings, outcome), (_, report) in zip(answers, plans, strict=True):
+            listings = apply_locally(listings, request.query, report)
+            outcome.listing_count = len(listings)
             result.listings.extend(listings)
             result.outcomes.append(outcome)
         if request.query.sort is not None:
             result.listings = sort_listings(result.listings, request.query.sort)
         return result
 
+    async def get_listing(self, request: ListingRequest) -> ListingResult:
+        """Get one Listing's full details. Never raises ProviderErrors; reports a status."""
+        if request.url is not None:
+            for provider in self.providers:
+                if not _has_listing_details(provider):
+                    continue
+                provider_id = provider.listing_id_from_url(request.url)
+                if provider_id is not None:
+                    return await self._get_listing(provider, provider_id)
+            return ListingResult(
+                status=ListingStatus.UNSUPPORTED,
+                message=f"no Provider with Listing details recognises {request.url}",
+            )
+        assert request.provider is not None and request.provider_id is not None
+        provider = self._providers.get(request.provider)
+        if provider is None:
+            return ListingResult(
+                status=ListingStatus.UNSUPPORTED,
+                message=f"no enabled Provider named {request.provider}",
+            )
+        if not _has_listing_details(provider):
+            return ListingResult(
+                status=ListingStatus.UNSUPPORTED,
+                provider=provider.name,
+                message=f"{provider.name} does not support Listing details",
+            )
+        return await self._get_listing(provider, request.provider_id)
+
+    async def _get_listing(
+        self, provider: ListingDetailsProvider, provider_id: str
+    ) -> ListingResult:
+        def failure(status: ListingStatus, message: str) -> ListingResult:
+            return ListingResult(status=status, provider=provider.name, message=message)
+
+        async def fetch() -> ListingDetails:
+            async with asyncio.timeout(self._timeout):
+                return await provider.get_listing(provider_id)
+
+        try:
+            listing = await self._guard.request(provider.name, fetch)
+        except ListingNotFound as exc:
+            return failure(ListingStatus.NOT_FOUND, exc.message)
+        except ProviderBlocked as exc:
+            return failure(ListingStatus.BLOCKED, exc.message)
+        except ProviderTimeout as exc:
+            return failure(ListingStatus.TIMED_OUT, exc.message)
+        except TimeoutError:
+            return failure(ListingStatus.TIMED_OUT, f"no answer within {self._timeout}s")
+        except ProviderError as exc:
+            return failure(ListingStatus.FAILED, exc.message)
+        return ListingResult(status=ListingStatus.OK, provider=provider.name, listing=listing)
+
     async def _ask(
-        self, provider: Provider, request: SearchRequest
+        self, provider: Provider, query: SearchQuery, limit: int
     ) -> tuple[list[Listing], ProviderOutcome]:
         def outcome(
             status: OutcomeStatus, message: str | None = None, count: int = 0
@@ -93,10 +163,10 @@ class Bonneaffaire:
 
         async def ask() -> list[Listing]:
             async with asyncio.timeout(self._timeout):
-                return await provider.search(request.query, request.limit)
+                return await provider.search(query, limit)
 
         try:
-            answer = await self._guard.request(provider.name, ask, key=_cache_key(request))
+            answer = await self._guard.request(provider.name, ask, key=_cache_key(query, limit))
         except ProviderBlocked as exc:
             return [], outcome(OutcomeStatus.BLOCKED, exc.message)
         except ProviderTimeout as exc:
@@ -109,7 +179,7 @@ class Bonneaffaire:
             return [], outcome(OutcomeStatus.FAILED, f"{type(exc).__name__}: {exc}")
         if not isinstance(answer, list) or not all(isinstance(i, Listing) for i in answer):
             return [], outcome(OutcomeStatus.FAILED, "unexpected response shape")
-        listings = answer[: request.limit]
+        listings = answer[:limit]
         return listings, outcome(OutcomeStatus.OK, count=len(listings))
 
     def _select(self, names: frozenset[str] | None) -> list[Provider]:
@@ -137,11 +207,14 @@ class Bonneaffaire:
         raise UnrecognisedNativeUrl(url, [provider.name for provider in accepting])
 
 
-def _cache_key(request: SearchRequest) -> str:
-    """The normalised request one Provider is asked: the whole query (keywords or Native URL,
-    Filters, sort) and the limit. Provider selection is left out: each Provider caches its
-    own answers."""
-    return request.model_dump_json(include={"query", "limit"})
+def _cache_key(query: SearchQuery, limit: int) -> str:
+    """The normalised request one Provider is asked: the whole query it receives (keywords or
+    Native URL, Filters, sort, extras) and the limit. Each Provider caches its own answers."""
+    return f"{limit}:{query.model_dump_json()}"
+
+
+def _has_listing_details(provider: Provider) -> TypeIs[ListingDetailsProvider]:
+    return provider.capabilities.listing_details and isinstance(provider, ListingDetailsProvider)
 
 
 def sort_listings(listings: list[Listing], order: Sort) -> list[Listing]:
