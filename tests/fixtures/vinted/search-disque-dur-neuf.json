@@ -1,0 +1,808 @@
+{
+  "items": [
+    {
+      "content_source": "search",
+      "favourite_count": 0,
+      "id": 10719259156,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "Lot de 2 câbles USB 3.0 Mâle vers Mâle - Haute Vitesse, Marque: Autre, État: Neuf sans étiquette, 5.00 €, 5.95 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "Autre",
+        "item_id": 10719259156,
+        "second_line": "Neuf sans étiquette"
+      },
+      "photo": {
+        "dominant_color": "#B1AAA4",
+        "dominant_color_opaque": "#E8E6E4",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/6b43d5cb.webp?s=ead17132828430994e9b555dc97ca8cf65cb10ea",
+        "height": 800,
+        "high_resolution": {
+          "id": "04_020de_c4pbsA1M2RitVLeyWn5zAdCx",
+          "orientation": null
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/70x100/6b43d5cb.webp?s=7c3322a8d8d5b0a7a0576a3568ed5e8d8cc8381d",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/150x210/6b43d5cb.webp?s=34cde6e7f35d2c6f3a989670d3b7f4248a2d924a",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/310x430/6b43d5cb.webp?s=0f88024a8ae984394b0dbac5721f4768a21d4657",
+            "width": 310
+          },
+          {
+            "height": 428,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/f800/6b43d5cb.webp?s=fe0b586b66ff6d3637513bdb56dacd4a99780c93",
+            "width": 321
+          },
+          {
+            "height": 624,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/f800/6b43d5cb.webp?s=fe0b586b66ff6d3637513bdb56dacd4a99780c93",
+            "width": 468
+          },
+          {
+            "height": 364,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/f800/6b43d5cb.webp?s=fe0b586b66ff6d3637513bdb56dacd4a99780c93",
+            "width": 273
+          }
+        ],
+        "url": "https://images1.vinted.net/t/04_020de_c4pbsA1M2RitVLeyWn5zAdCx/f800/6b43d5cb.webp?s=fe0b586b66ff6d3637513bdb56dacd4a99780c93",
+        "width": 600
+      },
+      "price": {
+        "amount": "5.00",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 1.0003472566604614
+      },
+      "service_fee": {
+        "amount": "0.95",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "Lot de 2 câbles USB 3.0 Mâle vers Mâle - Haute Vitesse",
+      "total_item_price": {
+        "amount": "5.95",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10719259156-lot-de-2-cables-usb-30-male-vers-male-haute-vitesse",
+      "user": {
+        "business": false,
+        "id": 900000002,
+        "login": "seller001"
+      },
+      "view_count": 0
+    },
+    {
+      "content_source": "search",
+      "favourite_count": 1,
+      "id": 10718885102,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "Disque dur externe Buffalo 1 To – Neuf emballé, Marque: Buffalo, État: Neuf avec étiquette, 30.00 €, 32.20 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "Buffalo",
+        "item_id": 10718885102,
+        "second_line": "Neuf avec étiquette"
+      },
+      "photo": {
+        "dominant_color": "#92908B",
+        "dominant_color_opaque": "#DEDEDC",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/ba383a7d.webp?s=2d83119107875c94db76beef44aa0d528ee2807a",
+        "height": 800,
+        "high_resolution": {
+          "id": "01_0070c_YDKpNmcAs6253yTYQ6cGcbZh",
+          "orientation": null
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/70x100/ba383a7d.webp?s=2ece864f0beaf9dda2621cd4b2f571f088c8e16e",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/150x210/ba383a7d.webp?s=d9e5c1e9f2691bacc98671ce720d1641e8275d75",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/310x430/ba383a7d.webp?s=31ed2c83fbf4be0c7a41041a1f518e746d4c2ceb",
+            "width": 310
+          },
+          {
+            "height": 428,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/f800/ba383a7d.webp?s=d1650934bce69713c7c576eaffec6c7e76b4f511",
+            "width": 321
+          },
+          {
+            "height": 624,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/f800/ba383a7d.webp?s=d1650934bce69713c7c576eaffec6c7e76b4f511",
+            "width": 468
+          },
+          {
+            "height": 364,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/f800/ba383a7d.webp?s=d1650934bce69713c7c576eaffec6c7e76b4f511",
+            "width": 273
+          }
+        ],
+        "url": "https://images1.vinted.net/t/01_0070c_YDKpNmcAs6253yTYQ6cGcbZh/f800/ba383a7d.webp?s=d1650934bce69713c7c576eaffec6c7e76b4f511",
+        "width": 600
+      },
+      "price": {
+        "amount": "30.00",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 0.5041666626930237
+      },
+      "service_fee": {
+        "amount": "2.20",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "Disque dur externe Buffalo 1 To – Neuf emballé",
+      "total_item_price": {
+        "amount": "32.20",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10718885102-disque-dur-externe-buffalo-1-to-neuf-emballe",
+      "user": {
+        "business": false,
+        "id": 900000004,
+        "login": "seller003"
+      },
+      "view_count": 0
+    },
+    {
+      "content_source": "search",
+      "favourite_count": 0,
+      "id": 10718800502,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "Disque externe 1to, Marque: Seagate, État: Neuf avec étiquette, 60.00 €, 63.70 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "Seagate",
+        "item_id": 10718800502,
+        "second_line": "Neuf avec étiquette"
+      },
+      "photo": {
+        "dominant_color": "#645E5B",
+        "dominant_color_opaque": "#D1CFCE",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/bbacaed7.webp?s=e7b5aef80301872c8635e5c2665eeac5fe886c28",
+        "height": 800,
+        "high_resolution": {
+          "id": "02_00aff_2QDDVQsUPCMtvqLcYDB22JLy",
+          "orientation": null
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/70x100/bbacaed7.webp?s=a73a81f6677a59f2c2cd50cd06ff39be2697566d",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/150x210/bbacaed7.webp?s=e6c5f139ab9aa297e5ca31bac24b700311a711d6",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/310x430/bbacaed7.webp?s=aeffb851bfdb62e171c67c04259a55518eb335ff",
+            "width": 310
+          },
+          {
+            "height": 428,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/f800/bbacaed7.webp?s=dbb1e1de0c1696776646643022ffbcebae569400",
+            "width": 321
+          },
+          {
+            "height": 624,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/f800/bbacaed7.webp?s=dbb1e1de0c1696776646643022ffbcebae569400",
+            "width": 468
+          },
+          {
+            "height": 364,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/f800/bbacaed7.webp?s=dbb1e1de0c1696776646643022ffbcebae569400",
+            "width": 273
+          }
+        ],
+        "url": "https://images1.vinted.net/t/02_00aff_2QDDVQsUPCMtvqLcYDB22JLy/f800/bbacaed7.webp?s=dbb1e1de0c1696776646643022ffbcebae569400",
+        "width": 600
+      },
+      "price": {
+        "amount": "60.00",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 0.33645832538604736
+      },
+      "service_fee": {
+        "amount": "3.70",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "Disque externe 1to",
+      "total_item_price": {
+        "amount": "63.70",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10718800502-disque-externe-1to",
+      "user": {
+        "business": false,
+        "id": 900000006,
+        "login": "seller005"
+      },
+      "view_count": 0
+    },
+    {
+      "content_source": "search",
+      "favourite_count": 0,
+      "id": 10718237958,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "Adaptateur wifi, Marque: Medion, État: Neuf sans étiquette, 5.00 €, 5.95 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "Medion",
+        "item_id": 10718237958,
+        "second_line": "Neuf sans étiquette"
+      },
+      "photo": {
+        "dominant_color": "#859099",
+        "dominant_color_opaque": "#DADEE0",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/a6ee6daf.webp?s=8d20757c5dd562ddb1a68bde14262795c7282f85",
+        "height": 798,
+        "high_resolution": {
+          "id": "02_01840_mJ5aGD6swpiEHjmGZK7eeVrT",
+          "orientation": null
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/70x100/a6ee6daf.webp?s=b030467b7a71e582428bbe6d980f8dec7e9f1a3d",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/150x210/a6ee6daf.webp?s=0398b139f11c005c1cb52e626ff41a22cd1c091d",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/310x430/a6ee6daf.webp?s=93107a1ced6c79063df9f3f5b295e4685de67d9e",
+            "width": 310
+          },
+          {
+            "height": 427,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/f800/a6ee6daf.webp?s=ac74a35f2d60f660a9c429a1aee8265c5a510121",
+            "width": 428
+          },
+          {
+            "height": 622,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/f800/a6ee6daf.webp?s=ac74a35f2d60f660a9c429a1aee8265c5a510121",
+            "width": 624
+          },
+          {
+            "height": 363,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/f800/a6ee6daf.webp?s=ac74a35f2d60f660a9c429a1aee8265c5a510121",
+            "width": 364
+          }
+        ],
+        "url": "https://images1.vinted.net/t/02_01840_mJ5aGD6swpiEHjmGZK7eeVrT/f800/a6ee6daf.webp?s=ac74a35f2d60f660a9c429a1aee8265c5a510121",
+        "width": 800
+      },
+      "price": {
+        "amount": "5.00",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 0.2509259283542633
+      },
+      "service_fee": {
+        "amount": "0.95",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "Adaptateur wifi",
+      "total_item_price": {
+        "amount": "5.95",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10718237958-adaptateur-wifi",
+      "user": {
+        "business": false,
+        "id": 900000008,
+        "login": "seller007"
+      },
+      "view_count": 0
+    },
+    {
+      "content_source": "search",
+      "favourite_count": 1,
+      "id": 10717921143,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "SSD Externe SanDisk Creator Phone 1 To - MagSafe (Neuf), Marque: Sandisk, État: Neuf avec étiquette, 160.00 €, 168.70 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "Sandisk",
+        "item_id": 10717921143,
+        "second_line": "Neuf avec étiquette"
+      },
+      "photo": {
+        "dominant_color": "#6F7B9E",
+        "dominant_color_opaque": "#D4D7E2",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/e36b7bc0.webp?s=d0d80597b4d57310d844637a35f88ff0e3e3c41a",
+        "height": 800,
+        "high_resolution": {
+          "id": "02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM",
+          "orientation": null
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/70x100/e36b7bc0.webp?s=c947fa402a965c163391f8bbcb77c4d281a373c0",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/150x210/e36b7bc0.webp?s=2b05486a4ae62cd2b91aed394919471ce0eafca4",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/310x430/e36b7bc0.webp?s=9af9c9d4ad11fb42f262757e8d083ed079c7d133",
+            "width": 310
+          },
+          {
+            "height": 428,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/f800/e36b7bc0.webp?s=069363504da47e219ebee21327bcc3214145b2e9",
+            "width": 197
+          },
+          {
+            "height": 624,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/f800/e36b7bc0.webp?s=069363504da47e219ebee21327bcc3214145b2e9",
+            "width": 288
+          },
+          {
+            "height": 364,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/f800/e36b7bc0.webp?s=069363504da47e219ebee21327bcc3214145b2e9",
+            "width": 168
+          }
+        ],
+        "url": "https://images1.vinted.net/t/02_01379_pTVTgcCUL3Yqu8JdLN5Fz2fM/f800/e36b7bc0.webp?s=069363504da47e219ebee21327bcc3214145b2e9",
+        "width": 369
+      },
+      "price": {
+        "amount": "160.00",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 0.2000892013311386
+      },
+      "service_fee": {
+        "amount": "8.70",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "SSD Externe SanDisk Creator Phone 1 To - MagSafe (Neuf)",
+      "total_item_price": {
+        "amount": "168.70",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10717921143-ssd-externe-sandisk-creator-phone-1-to-magsafe-neuf",
+      "user": {
+        "business": false,
+        "id": 900000010,
+        "login": "seller009"
+      },
+      "view_count": 0
+    },
+    {
+      "content_source": "search",
+      "favourite_count": 0,
+      "id": 10717608290,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "Adaptateur convertisseur Zilkee ide vers sata 2.5, État: Neuf avec étiquette, 15.00 €, 16.45 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "Adaptateur convertisseur Zilkee ide vers sata 2.5",
+        "item_id": 10717608290,
+        "second_line": "Neuf avec étiquette"
+      },
+      "photo": {
+        "dominant_color": "#483B37",
+        "dominant_color_opaque": "#C8C4C3",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/06_00d1c_Bve3aj16EbQxx656JtRxABTM/792d8efb.webp?s=2c78cd330b2301f49c58ea250c39a4d253120098",
+        "height": 800,
+        "high_resolution": {
+          "id": "06_00d1c_Bve3aj16EbQxx656JtRxABTM",
+          "orientation": null
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/06_00d1c_Bve3aj16EbQxx656JtRxABTM/70x100/792d8efb.webp?s=e9d9e2a584d6c2c37179a9d650683ba3bcf61cf8",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/06_00d1c_Bve3aj16EbQxx656JtRxABTM/150x210/792d8efb.webp?s=ce55c52167a6d8091cf6cf15181f0836f9f80a7a",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/06_00d1c_Bve3aj16EbQxx656JtRxABTM/310x430/792d8efb.webp?s=fea33e74f9725c693dd663c81af219bf0edf7623",
+            "width": 310
+          },
+          {
+            "height": 428,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/06_00d1c_Bve3aj16EbQxx656JtRxABTM/f800/792d8efb.webp?s=b7dd89f6f3ebd9431ad92fc67626f111617cc03a",
+            "width": 321
+          },
+          {
+            "height": 624,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/06_00d1c_Bve3aj16EbQxx656JtRxABTM/f800/792d8efb.webp?s=b7dd89f6f3ebd9431ad92fc67626f111617cc03a",
+            "width": 468
+          },
+          {
+            "height": 364,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/06_00d1c_Bve3aj16EbQxx656JtRxABTM/f800/792d8efb.webp?s=b7dd89f6f3ebd9431ad92fc67626f111617cc03a",
+            "width": 273
+          }
+        ],
+        "url": "https://images1.vinted.net/t/06_00d1c_Bve3aj16EbQxx656JtRxABTM/f800/792d8efb.webp?s=b7dd89f6f3ebd9431ad92fc67626f111617cc03a",
+        "width": 600
+      },
+      "price": {
+        "amount": "15.00",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 0.16678307950496674
+      },
+      "service_fee": {
+        "amount": "1.45",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "Adaptateur convertisseur Zilkee ide vers sata 2.5",
+      "total_item_price": {
+        "amount": "16.45",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10717608290-adaptateur-convertisseur-zilkee-ide-vers-sata-25",
+      "user": {
+        "business": false,
+        "id": 900000012,
+        "login": "seller011"
+      },
+      "view_count": 0
+    },
+    {
+      "content_source": "search",
+      "favourite_count": 2,
+      "id": 10707873175,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "Disque Dur externe laCie Rugged Mini 1 To, Marque: LaCie, État: Neuf sans étiquette, 90.00 €, 95.20 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "LaCie",
+        "item_id": 10707873175,
+        "second_line": "Neuf sans étiquette"
+      },
+      "photo": {
+        "dominant_color": "#A8A9AA",
+        "dominant_color_opaque": "#E5E5E6",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/e682b54e.webp?s=5731b7106a36e0afcdc30e32643a5d3f3e893be8",
+        "height": 800,
+        "high_resolution": {
+          "id": "02_01bcf_DeQ9fdyorHp9BdymDbbuURgW",
+          "orientation": 0
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/70x100/e682b54e.webp?s=db01b506c3e1d0bf0ed47210fd932cf33e590632",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/150x210/e682b54e.webp?s=c91e8d359c6ed61aa80ae64b354566ab3204f457",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/310x430/e682b54e.webp?s=cdc0b37b178cbbcc0f2b8b903c9d28e713213743",
+            "width": 310
+          },
+          {
+            "height": 428,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/f800/e682b54e.webp?s=a40764781ff265e170ef3724c76329edeefca765",
+            "width": 321
+          },
+          {
+            "height": 624,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/f800/e682b54e.webp?s=a40764781ff265e170ef3724c76329edeefca765",
+            "width": 468
+          },
+          {
+            "height": 364,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/f800/e682b54e.webp?s=a40764781ff265e170ef3724c76329edeefca765",
+            "width": 273
+          }
+        ],
+        "url": "https://images1.vinted.net/t/02_01bcf_DeQ9fdyorHp9BdymDbbuURgW/f800/e682b54e.webp?s=a40764781ff265e170ef3724c76329edeefca765",
+        "width": 600
+      },
+      "price": {
+        "amount": "90.00",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 0.023961352184414864
+      },
+      "service_fee": {
+        "amount": "5.20",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "Disque Dur externe laCie Rugged Mini 1 To",
+      "total_item_price": {
+        "amount": "95.20",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10707873175-disque-dur-externe-lacie-rugged-mini-1-to",
+      "user": {
+        "business": true,
+        "id": 900000014,
+        "login": "seller013"
+      },
+      "view_count": 0
+    },
+    {
+      "content_source": "search",
+      "favourite_count": 6,
+      "id": 10699215320,
+      "is_favourite": false,
+      "item_box": {
+        "accessibility_label": "SSD Externe Samsung T7 500 Go Neuf, Marque: Samsung, État: Neuf sans étiquette, 94.99 €, 100.44 €",
+        "exposures": [],
+        "ff_exposures": [],
+        "first_line": "Samsung",
+        "item_id": 10699215320,
+        "second_line": "Neuf sans étiquette"
+      },
+      "photo": {
+        "dominant_color": "#BB9A9B",
+        "dominant_color_opaque": "#EBE1E1",
+        "extra": {},
+        "full_size_url": "https://images1.vinted.net/tc/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/9e7423d8.webp?s=27866d4b807f91ece6758ae74af07e57c4dea7b4",
+        "height": 800,
+        "high_resolution": {
+          "id": "05_00d62_Vbroru1LXjjrBR3KXQHq2zRR",
+          "orientation": null
+        },
+        "id": 1,
+        "image_no": 1,
+        "is_main": true,
+        "thumbnails": [
+          {
+            "height": 100,
+            "original_size": null,
+            "type": "thumb70x100",
+            "url": "https://images1.vinted.net/t/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/70x100/9e7423d8.webp?s=5dee8ded1a79abbee2ab5ae6170451b0b938da4f",
+            "width": 70
+          },
+          {
+            "height": 210,
+            "original_size": null,
+            "type": "thumb150x210",
+            "url": "https://images1.vinted.net/t/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/150x210/9e7423d8.webp?s=b784ada1fc84b162fe6f30f46a965eac19e93fc5",
+            "width": 150
+          },
+          {
+            "height": 430,
+            "original_size": null,
+            "type": "thumb310x430",
+            "url": "https://images1.vinted.net/t/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/310x430/9e7423d8.webp?s=f3f55af38c8d8fe2b80b1c9b06503fc84f67cb5e",
+            "width": 310
+          },
+          {
+            "height": 428,
+            "original_size": true,
+            "type": "thumb428x624",
+            "url": "https://images1.vinted.net/t/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/f800/9e7423d8.webp?s=7de36cb753c07c75988518f692a8806f157cf203",
+            "width": 321
+          },
+          {
+            "height": 624,
+            "original_size": true,
+            "type": "thumb624x428",
+            "url": "https://images1.vinted.net/t/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/f800/9e7423d8.webp?s=7de36cb753c07c75988518f692a8806f157cf203",
+            "width": 468
+          },
+          {
+            "height": 364,
+            "original_size": true,
+            "type": "thumb364x428",
+            "url": "https://images1.vinted.net/t/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/f800/9e7423d8.webp?s=7de36cb753c07c75988518f692a8806f157cf203",
+            "width": 273
+          }
+        ],
+        "url": "https://images1.vinted.net/t/05_00d62_Vbroru1LXjjrBR3KXQHq2zRR/f800/9e7423d8.webp?s=7de36cb753c07c75988518f692a8806f157cf203",
+        "width": 600
+      },
+      "price": {
+        "amount": "94.99",
+        "currency_code": "EUR"
+      },
+      "promoted": false,
+      "search_tracking_params": {
+        "score": 0.01467941515147686
+      },
+      "service_fee": {
+        "amount": "5.45",
+        "currency_code": "EUR"
+      },
+      "show_1st_time_seller_discount": false,
+      "title": "SSD Externe Samsung T7 500 Go Neuf",
+      "total_item_price": {
+        "amount": "100.44",
+        "currency_code": "EUR"
+      },
+      "url": "/items/10699215320-ssd-externe-samsung-t7-500-go-neuf",
+      "user": {
+        "business": true,
+        "id": 900000016,
+        "login": "seller015"
+      },
+      "view_count": 0
+    }
+  ],
+  "pagination": {
+    "current_page": 1,
+    "per_page": 96,
+    "time": 1794148589,
+    "total_entries": 960,
+    "total_pages": 10
+  },
+  "search_tracking_params": {
+    "global_search_session_id": "5001326f-a262-4d4b-ac08-513fe5619632",
+    "search_correlation_id": "8ed0e4bf-8964-43f5-8cc8-42b11005c2d5",
+    "search_session_id": "25219113-eaab-451d-8581-fb9df5b7cf3a"
+  }
+}

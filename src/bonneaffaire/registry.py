@@ -6,12 +6,13 @@ from collections.abc import Mapping
 from bonneaffaire.core import Bonneaffaire
 from bonneaffaire.providers import Provider
 from bonneaffaire.providers.ldlc import ldlc
+from bonneaffaire.providers.vinted import vinted
 
 DISABLED_PROVIDERS_VARIABLE = "BONNEAFFAIRE_DISABLED_PROVIDERS"
 
 
 def default_providers() -> list[Provider]:
-    return [ldlc()]
+    return [ldlc(), vinted()]
 
 
 def default_core(environ: Mapping[str, str] = os.environ) -> Bonneaffaire:
