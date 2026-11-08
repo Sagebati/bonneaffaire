@@ -1,37 +1,157 @@
 """The core library: the single entry point the CLI and the MCP server adapt."""
 
+import asyncio
 from collections.abc import Iterable
 
-from bonneaffaire.filters import apply_locally, plan, sort_merged
-from bonneaffaire.models import OutcomeStatus, ProviderOutcome, SearchRequest, SearchResult
-from bonneaffaire.providers import Provider
+from bonneaffaire.filters import apply_locally, plan
+from bonneaffaire.models import (
+    Listing,
+    OutcomeStatus,
+    ProviderOutcome,
+    SearchQuery,
+    SearchRequest,
+    SearchResult,
+    Sort,
+)
+from bonneaffaire.providers import (
+    NativeUrlProvider,
+    Provider,
+    ProviderBlocked,
+    ProviderError,
+    ProviderTimeout,
+)
+
+DEFAULT_TIMEOUT = 20.0
+
+
+class UnrecognisedNativeUrl(ValueError):
+    """No Provider recognises the Native URL a Search was given."""
+
+    def __init__(self, url: str, providers: list[str]) -> None:
+        accepting = ", ".join(providers) or "none"
+        super().__init__(
+            f"no Provider recognises the Native URL {url} "
+            f"(Providers accepting Native URLs: {accepting})"
+        )
+        self.url = url
 
 
 class Bonneaffaire:
-    def __init__(self, providers: Iterable[Provider]) -> None:
-        self._providers = {provider.name: provider for provider in providers}
+    def __init__(
+        self,
+        providers: Iterable[Provider],
+        *,
+        enabled: Iterable[str] | None = None,
+        timeout: float = DEFAULT_TIMEOUT,
+    ) -> None:
+        """enabled: names of the Providers to keep; None keeps them all. Others are ignored.
+
+        timeout: seconds each Provider gets to answer one Search.
+        """
+        keep = None if enabled is None else set(enabled)
+        self._providers = {
+            provider.name: provider
+            for provider in providers
+            if keep is None or provider.name in keep
+        }
+        self._timeout = timeout
 
     @property
     def providers(self) -> list[Provider]:
         return list(self._providers.values())
 
     async def search(self, request: SearchRequest) -> SearchResult:
-        """Run one Search.
+        """Run one Search: ask the selected Providers concurrently and merge what they return.
 
-        For now each Provider is asked in turn and ProviderErrors propagate. Ticket 02 turns
-        this into a concurrent fan-out with timeouts that maps ProviderErrors to outcomes.
+        A Provider that fails never fails the Search: it gets a non-ok Provider outcome and the
+        other Providers' Listings are kept.
         """
-        result = SearchResult(listings=[], outcomes=[])
-        for provider in self.providers:
-            query, report = plan(provider.name, provider.capabilities, request.query)
-            result.filter_reports.append(report)
-            fetched = await provider.search(query, request.limit)
-            listings = apply_locally(fetched, request.query, report)[: request.limit]
-            result.listings.extend(listings)
-            result.outcomes.append(
-                ProviderOutcome(
-                    provider=provider.name, status=OutcomeStatus.OK, listing_count=len(listings)
-                )
+        providers = self._providers_for(request.query, self._select(request.providers))
+        plans = [
+            plan(provider.name, provider.capabilities, request.query) for provider in providers
+        ]
+        answers = await asyncio.gather(
+            *(
+                self._ask(provider, query, request.limit)
+                for provider, (query, _) in zip(providers, plans, strict=True)
             )
-        result.listings = sort_merged(result.listings, request.query.sort)
+        )
+        result = SearchResult(listings=[], outcomes=[], filter_reports=[r for _, r in plans])
+        for (listings, outcome), (_, report) in zip(answers, plans, strict=True):
+            listings = apply_locally(listings, request.query, report)
+            outcome.listing_count = len(listings)
+            result.listings.extend(listings)
+            result.outcomes.append(outcome)
+        if request.query.sort is not None:
+            result.listings = sort_listings(result.listings, request.query.sort)
         return result
+
+    async def _ask(
+        self, provider: Provider, query: SearchQuery, limit: int
+    ) -> tuple[list[Listing], ProviderOutcome]:
+        def outcome(
+            status: OutcomeStatus, message: str | None = None, count: int = 0
+        ) -> ProviderOutcome:
+            return ProviderOutcome(
+                provider=provider.name, status=status, listing_count=count, message=message
+            )
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                answer = await provider.search(query, limit)
+        except ProviderBlocked as exc:
+            return [], outcome(OutcomeStatus.BLOCKED, exc.message)
+        except ProviderTimeout as exc:
+            return [], outcome(OutcomeStatus.TIMED_OUT, exc.message)
+        except TimeoutError:
+            return [], outcome(OutcomeStatus.TIMED_OUT, f"no answer within {self._timeout}s")
+        except ProviderError as exc:
+            return [], outcome(OutcomeStatus.FAILED, exc.message)
+        except Exception as exc:  # any Provider bug is that Provider's failure
+            return [], outcome(OutcomeStatus.FAILED, f"{type(exc).__name__}: {exc}")
+        if not isinstance(answer, list) or not all(isinstance(i, Listing) for i in answer):
+            return [], outcome(OutcomeStatus.FAILED, "unexpected response shape")
+        listings = answer[:limit]
+        return listings, outcome(OutcomeStatus.OK, count=len(listings))
+
+    def _select(self, names: frozenset[str] | None) -> list[Provider]:
+        if names is None:
+            return self.providers
+        unknown = names - self._providers.keys()
+        if unknown:
+            raise UnknownProvider(sorted(unknown))
+        return [provider for provider in self.providers if provider.name in names]
+
+    def _providers_for(self, query: SearchQuery, selected: list[Provider]) -> list[Provider]:
+        """Every selected Provider for a keyword Search; only the one that recognises a
+        Native URL."""
+        url = query.native_url
+        if url is None:
+            return selected
+        accepting = [
+            provider
+            for provider in selected
+            if provider.capabilities.native_urls and isinstance(provider, NativeUrlProvider)
+        ]
+        for provider in accepting:
+            if provider.recognises_native_url(url):
+                return [provider]
+        raise UnrecognisedNativeUrl(url, [provider.name for provider in accepting])
+
+
+def sort_listings(listings: list[Listing], order: Sort) -> list[Listing]:
+    """Price: cheapest first (cents compared as-is, never converted). Recency: newest first,
+    undated last. Both are stable, so ties keep Provider order."""
+    if order is Sort.PRICE:
+        return sorted(listings, key=lambda item: item.price.cents)
+    dated = [item for item in listings if item.posted_at is not None]
+    undated = [item for item in listings if item.posted_at is None]
+    return sorted(dated, key=lambda item: item.posted_at or 0, reverse=True) + undated
+
+
+class UnknownProvider(ValueError):
+    """The request names Providers that do not exist or are not enabled."""
+
+    def __init__(self, names: list[str]) -> None:
+        super().__init__(f"Unknown or disabled Providers: {', '.join(names)}")
+        self.names = names

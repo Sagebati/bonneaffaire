@@ -1,12 +1,13 @@
 """Splitting a query's Filters between a Provider and the core, and applying the core's share."""
 
-from bonneaffaire.models import FilterName, FilterReport, Listing, SearchQuery, Sort
+from bonneaffaire.models import FilterName, FilterReport, Listing, SearchQuery
 from bonneaffaire.providers import Capabilities
 
 LOCALLY_APPLICABLE = frozenset(
     {FilterName.PRICE_MIN, FilterName.PRICE_MAX, FilterName.CONDITION, FilterName.SORT}
 )
-"""Location is never applied locally: Listings carry free-text places, not coordinates."""
+"""Location is never applied locally: Listings carry free-text places, not coordinates.
+Sort is applied by the core to the merged Listings (see core.sort_listings)."""
 
 
 def plan(
@@ -53,18 +54,3 @@ def _passes(item: Listing, query: SearchQuery, name: FilterName) -> bool:
             return item.condition in query.conditions
         case _:
             return True
-
-
-def sort_merged(listings: list[Listing], sort: Sort | None) -> list[Listing]:
-    """Order the merged Listings of all Providers. Relevance keeps each Provider's own order."""
-    match sort:
-        case Sort.PRICE_ASC:
-            return sorted(listings, key=lambda item: item.price.cents)
-        case Sort.PRICE_DESC:
-            return sorted(listings, key=lambda item: item.price.cents, reverse=True)
-        case Sort.NEWEST:
-            dated = [item for item in listings if item.posted_at is not None]
-            undated = [item for item in listings if item.posted_at is None]
-            return sorted(dated, key=lambda item: item.posted_at or 0, reverse=True) + undated
-        case _:
-            return listings

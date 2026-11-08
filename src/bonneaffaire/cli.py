@@ -9,7 +9,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from bonneaffaire.core import Bonneaffaire
+from bonneaffaire.core import Bonneaffaire, UnknownProvider, UnrecognisedNativeUrl
 from bonneaffaire.models import (
     DEFAULT_LIMIT,
     Condition,
@@ -21,7 +21,6 @@ from bonneaffaire.models import (
     SearchResult,
     Sort,
 )
-from bonneaffaire.providers import ProviderError
 from bonneaffaire.registry import default_core
 
 
@@ -34,10 +33,19 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
 
     @app.command()
     def search(
-        keywords: Annotated[list[str], typer.Argument(help="What to look for.")],
+        keywords: Annotated[
+            list[str],
+            typer.Argument(help="What to look for, or a Native URL copied from a Provider."),
+        ],
         limit: Annotated[
             int, typer.Option(min=1, help="Maximum Listings per Provider.")
         ] = DEFAULT_LIMIT,
+        providers: Annotated[
+            list[str] | None,
+            typer.Option(
+                "--provider", "-p", help="Ask only this Provider (repeatable). Default: all."
+            ),
+        ] = None,
         min_price: Annotated[
             str | None, typer.Option(help="Minimum Price in euros, e.g. 99.90.")
         ] = None,
@@ -54,29 +62,36 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
         radius_km: Annotated[
             int | None, typer.Option(min=1, help="Radius around --near, in km.")
         ] = None,
-        sort: Annotated[Sort | None, typer.Option(help="Order of the merged Listings.")] = None,
+        sort: Annotated[
+            Sort | None, typer.Option(help="Sort merged Listings by price or recency.")
+        ] = None,
         extra: Annotated[
             list[str] | None,
             typer.Option(help="Provider-specific extra as provider.name=value; repeatable."),
         ] = None,
         as_json: Annotated[bool, typer.Option("--json", help="Print JSON.")] = False,
     ) -> None:
-        """Search for Listings."""
+        """Search for Listings by keywords, or by a Native URL from a Provider's website."""
         if radius_km is not None and near is None:
             raise typer.BadParameter("needs --near", param_hint="--radius-km")
-        query = SearchQuery(
-            keywords=" ".join(keywords),
-            price_min=parse_euros(min_price, "--min-price"),
-            price_max=parse_euros(max_price, "--max-price"),
-            conditions=frozenset(condition or ()),
-            location=Location(place=near, radius_km=radius_km) if near else None,
-            sort=sort,
-            extras=parse_extras(extra or []),
+        filters = {
+            "price_min": parse_euros(min_price, "--min-price"),
+            "price_max": parse_euros(max_price, "--max-price"),
+            "conditions": frozenset(condition or ()),
+            "location": Location(place=near, radius_km=radius_km) if near else None,
+            "sort": sort,
+            "extras": parse_extras(extra or []),
+        }
+        request = SearchRequest(
+            query=query_from_arguments(keywords).model_copy(update=filters),
+            limit=limit,
+            providers=frozenset(providers) if providers else None,
         )
-        request = SearchRequest(query=query, limit=limit)
         try:
             result = asyncio.run(core_factory().search(request))
-        except ProviderError as exc:
+        except UnknownProvider as exc:
+            raise typer.BadParameter(str(exc), param_hint="--provider") from exc
+        except UnrecognisedNativeUrl as exc:
             typer.echo(f"Search failed: {exc}", err=True)
             raise typer.Exit(1) from exc
         if as_json:
@@ -85,6 +100,13 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
             print_table(result)
 
     return app
+
+
+def query_from_arguments(arguments: list[str]) -> SearchQuery:
+    """A single http(s) argument is a Native URL; anything else is keywords."""
+    if len(arguments) == 1 and arguments[0].startswith(("http://", "https://")):
+        return SearchQuery(native_url=arguments[0])
+    return SearchQuery(keywords=" ".join(arguments))
 
 
 def parse_euros(text: str | None, option: str) -> Money | None:
@@ -138,10 +160,13 @@ def print_table(result: SearchResult) -> None:
     console = Console()
     console.print(table)
     for outcome in result.outcomes:
-        console.print(f"{outcome.provider}: {outcome.status} ({outcome.listing_count} Listings)")
+        line = f"{outcome.provider}: {outcome.status} ({outcome.listing_count} Listings)"
+        if outcome.message:
+            line += f" {outcome.message}"
+        console.print(line, markup=False, highlight=False)
     for report in result.filter_reports:
         if (line := describe_filters(report)) is not None:
-            console.print(line, markup=False)
+            console.print(line, markup=False, highlight=False)
 
 
 def main() -> None:

@@ -8,7 +8,7 @@ CSS selectors pick Listings out of its server-rendered search page. Product page
 import re
 from dataclasses import dataclass, field
 from typing import Any
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, urldefrag, urljoin, urlsplit
 
 import httpx
 from selectolax.lexbor import LexborHTMLParser as HTMLParser
@@ -66,6 +66,10 @@ class RetailSite:
     condition_label: str
     seller_kind: SellerKind
     search_page: SearchPage
+    native_url_hosts: frozenset[str] = field(default_factory=frozenset)
+    """Hosts whose search pages this site accepts as Native URLs; empty means none."""
+    native_url_path_prefix: str = "/"
+    """Path prefix that marks a search page on those hosts."""
     timeout_seconds: float = 15.0
 
 
@@ -84,10 +88,26 @@ class RetailProvider:
 
     @property
     def capabilities(self) -> Capabilities:
-        return Capabilities()
+        return Capabilities(native_urls=bool(self.site.native_url_hosts))
+
+    def recognises_native_url(self, url: str) -> bool:
+        try:
+            parts = urlsplit(url)
+        except ValueError:
+            return False
+        return (
+            parts.scheme in {"http", "https"}
+            and (parts.hostname or "") in self.site.native_url_hosts
+            and parts.path.startswith(self.site.native_url_path_prefix)
+        )
 
     async def search(self, query: SearchQuery, limit: int) -> list[Listing]:
-        url = self.site.search_url.format(keywords=quote(query.keywords, safe=""))
+        if query.native_url is not None:
+            if not self.recognises_native_url(query.native_url):
+                raise ProviderError(self.name, f"not a {self.name} Native URL: {query.native_url}")
+            url = urldefrag(query.native_url).url
+        else:
+            url = self.site.search_url.format(keywords=quote(query.keywords or "", safe=""))
         html = await self._fetch(url)
         return self._parse_search_page(html)[:limit]
 

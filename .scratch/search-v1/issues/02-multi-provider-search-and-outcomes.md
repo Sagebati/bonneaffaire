@@ -6,11 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] A Search can target all enabled Providers or an explicit subset
-- [ ] Providers are queried concurrently, with a per-Provider timeout
-- [ ] Each Provider returns at most the per-Provider limit; the default is 50
-- [ ] Merged results sort correctly by Price and by recency across Providers
-- [ ] When one fake Provider raises blocked, times out, fails, or returns an unexpected shape, the Search still returns the other Providers' Listings and reports the correct outcome for each Provider
-- [ ] An empty result from a healthy Provider is reported as ok with zero Listings, which is distinct from blocked or failed
-- [ ] Providers can be enabled or disabled in configuration
-- [ ] Tested at the core Search seam with fake Providers
+- [x] A Search can target all enabled Providers or an explicit subset
+- [x] Providers are queried concurrently, with a per-Provider timeout
+- [x] Each Provider returns at most the per-Provider limit; the default is 50
+- [x] Merged results sort correctly by Price and by recency across Providers
+- [x] When one fake Provider raises blocked, times out, fails, or returns an unexpected shape, the Search still returns the other Providers' Listings and reports the correct outcome for each Provider
+- [x] An empty result from a healthy Provider is reported as ok with zero Listings, which is distinct from blocked or failed
+- [x] Providers can be enabled or disabled in configuration
+- [x] Tested at the core Search seam with fake Providers

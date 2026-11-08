@@ -1,7 +1,5 @@
 """Filters at the core Search seam, with fake Providers declaring different native Filters."""
 
-from datetime import UTC, datetime
-
 from bonneaffaire.core import Bonneaffaire
 from bonneaffaire.models import (
     Condition,
@@ -165,52 +163,17 @@ class CheapestFirstProvider(DumbProvider):
     capabilities = Capabilities(native_filters=frozenset({FilterName.SORT}))
 
 
-async def test_sort_orders_the_merged_listings_across_providers():
-    one = CheapestFirstProvider(
-        "one", [listing("one", "one-200", 200), listing("one", "one-50", 50)]
-    )
-    two = DumbProvider("two", [listing("two", "two-300", 300), listing("two", "two-100", 100)])
+async def test_sort_is_reported_native_for_providers_that_sort_and_local_for_the_rest():
+    one = CheapestFirstProvider("one", [listing("one", "one-200", 200)])
+    two = DumbProvider("two", [listing("two", "two-100", 100)])
     core = Bonneaffaire([one, two])
 
-    cheapest = await core.search(
-        SearchRequest(query=SearchQuery(keywords="disque", sort=Sort.PRICE_ASC))
-    )
-    dearest = await core.search(
-        SearchRequest(query=SearchQuery(keywords="disque", sort=Sort.PRICE_DESC))
-    )
+    result = await core.search(SearchRequest(query=SearchQuery(keywords="disque", sort=Sort.PRICE)))
 
-    assert [item.provider_id for item in cheapest.listings] == [
-        "one-50",
-        "two-100",
-        "one-200",
-        "two-300",
-    ]
-    assert [item.provider_id for item in dearest.listings] == [
-        "two-300",
-        "one-200",
-        "two-100",
-        "one-50",
-    ]
-    reports = {report.provider: report for report in cheapest.filter_reports}
+    assert [item.provider_id for item in result.listings] == ["two-100", "one-200"]
+    reports = {report.provider: report for report in result.filter_reports}
     assert reports["one"].native == [FilterName.SORT]
     assert reports["two"].local == [FilterName.SORT]
-
-
-async def test_newest_first_puts_listings_without_a_posting_date_last():
-    provider = DumbProvider(
-        "dated",
-        [
-            listing("dated", "undated", 100),
-            listing("dated", "old", 100, posted_at=datetime(2026, 1, 1, tzinfo=UTC)),
-            listing("dated", "recent", 100, posted_at=datetime(2026, 11, 1, tzinfo=UTC)),
-        ],
-    )
-
-    result = await Bonneaffaire([provider]).search(
-        SearchRequest(query=SearchQuery(keywords="disque", sort=Sort.NEWEST))
-    )
-
-    assert [item.provider_id for item in result.listings] == ["recent", "old", "undated"]
 
 
 class CategoryProvider(DumbProvider):

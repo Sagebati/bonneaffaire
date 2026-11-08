@@ -7,7 +7,8 @@ from typer.testing import CliRunner
 from bonneaffaire.cli import make_app
 from bonneaffaire.core import Bonneaffaire
 from bonneaffaire.models import Condition, Listing, Location, Money, SearchQuery, SellerKind, Sort
-from bonneaffaire.providers import Capabilities
+from bonneaffaire.providers import Capabilities, ProviderBlocked
+from bonneaffaire.registry import default_core
 
 LISTING = Listing(
     provider="fake",
@@ -86,7 +87,7 @@ def test_search_passes_every_filter_and_extras_to_the_core():
             "--radius-km",
             "20",
             "--sort",
-            "price_asc",
+            "price",
             "--extra",
             "fake.category=15",
             "--json",
@@ -99,7 +100,7 @@ def test_search_passes_every_filter_and_extras_to_the_core():
     assert query.price_max == Money(cents=45050, currency="EUR")
     assert query.conditions == {Condition.NEW, Condition.LIKE_NEW}
     assert query.location == Location(place="Lyon", radius_km=20)
-    assert query.sort == Sort.PRICE_ASC
+    assert query.sort == Sort.PRICE
     payload = json.loads(result.output)
     assert payload["filter_reports"] == [
         {
@@ -129,3 +130,80 @@ def test_a_malformed_extra_is_rejected():
 
     assert result.exit_code == 2
     assert "provider.name=value" in result.output
+
+
+class BlockedProvider:
+    name = "blocked"
+    country = "FR"
+    capabilities = Capabilities()
+
+    async def search(self, query: SearchQuery, limit: int) -> list[Listing]:
+        raise ProviderBlocked(self.name, "403 Forbidden")
+
+
+def test_search_shows_provider_outcomes_alongside_the_listings():
+    app = make_app(lambda: Bonneaffaire([FakeProvider(), BlockedProvider()]))
+
+    result = CliRunner(env={"COLUMNS": "200"}).invoke(app, ["search", "disque", "--sort", "price"])
+
+    assert result.exit_code == 0, result.output
+    assert "IronWolf 8 To" in result.output
+    assert "fake: ok (1 Listings)" in result.output
+    assert "blocked: blocked (0 Listings) 403 Forbidden" in result.output
+
+
+def test_search_can_target_chosen_providers():
+    fake = FakeProvider()
+    app = make_app(lambda: Bonneaffaire([fake, BlockedProvider()]))
+
+    result = CliRunner().invoke(app, ["search", "disque", "--provider", "fake", "--json"])
+
+    assert result.exit_code == 0, result.output
+    assert [o["provider"] for o in json.loads(result.output)["outcomes"]] == ["fake"]
+
+
+def test_search_rejects_unknown_providers():
+    app = make_app(lambda: Bonneaffaire([FakeProvider()]))
+
+    result = CliRunner().invoke(app, ["search", "disque", "--provider", "nope"])
+
+    assert result.exit_code == 2
+    assert "nope" in result.output
+
+
+def test_providers_can_be_disabled_in_configuration():
+    enabled = default_core({})
+    disabled = default_core({"BONNEAFFAIRE_DISABLED_PROVIDERS": "ldlc"})
+
+    assert [p.name for p in enabled.providers] == ["ldlc"]
+    assert disabled.providers == []
+
+
+class FakeUrlProvider(FakeProvider):
+    capabilities = Capabilities(native_urls=True)
+
+    def recognises_native_url(self, url: str) -> bool:
+        return url.startswith("https://fake.example/")
+
+
+def test_search_accepts_a_native_url_instead_of_keywords():
+    provider = FakeUrlProvider()
+    app = make_app(lambda: Bonneaffaire([provider]))
+
+    url = "https://fake.example/recherche/disque/"
+    result = CliRunner().invoke(app, ["search", url, "--json"])
+
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output)["listings"][0]["provider_id"] == "PB1"
+    assert provider.asked == [(SearchQuery(native_url=url), 50)]
+
+
+def test_an_unrecognised_native_url_is_reported_and_exits_non_zero():
+    provider = FakeUrlProvider()
+    app = make_app(lambda: Bonneaffaire([provider]))
+
+    result = CliRunner().invoke(app, ["search", "https://elsewhere.example/x"])
+
+    assert result.exit_code == 1
+    assert "no Provider recognises the Native URL https://elsewhere.example/x" in result.output
+    assert provider.asked == []

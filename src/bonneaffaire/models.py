@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
 DEFAULT_LIMIT = 50
 
@@ -79,10 +79,10 @@ class FilterName(StrEnum):
 
 
 class Sort(StrEnum):
-    RELEVANCE = "relevance"
-    PRICE_ASC = "price_asc"
-    PRICE_DESC = "price_desc"
-    NEWEST = "newest"
+    """How merged Listings are ordered: cheapest Price first, or newest first."""
+
+    PRICE = "price"
+    RECENCY = "recency"
 
 
 class Location(BaseModel):
@@ -95,21 +95,31 @@ class Location(BaseModel):
 
 
 class SearchQuery(BaseModel):
-    """What one Provider is asked to search for: keywords plus the canonical Filters.
+    """What one Provider is asked to search for: keywords plus Filters, or a Native URL.
 
-    `extras` maps a Provider name to its Provider-specific extras; each Provider only ever
-    sees its own entry, and only the extras it declares. Native URLs (ticket 04) are added here.
+    A Native URL is the whole Search request: it goes only to the Provider that recognises
+    it, which runs the search the URL describes.
+    sort: the core sorts merged Listings after merging; None keeps Provider order.
+    extras: Provider name to its Provider-specific extras; each Provider only ever sees its
+    own entry, and only the extras it declares.
     """
 
     model_config = ConfigDict(frozen=True)
 
-    keywords: str
+    keywords: str | None = None
+    native_url: str | None = None
     price_min: Money | None = None
     price_max: Money | None = None
     conditions: frozenset[Condition] = frozenset()
     location: Location | None = None
     sort: Sort | None = None
     extras: dict[str, dict[str, str]] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def _keywords_or_native_url(self) -> SearchQuery:
+        if (self.keywords is None) == (self.native_url is None):
+            raise ValueError("a Search takes keywords or a Native URL, exactly one of them")
+        return self
 
     def filters_set(self) -> list[FilterName]:
         """The canonical Filters this query uses, in FilterName order."""
@@ -124,15 +134,16 @@ class SearchQuery(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    """A Search as the caller asks it: the query and how many Listings per Provider.
+    """A Search as the caller asks it: the query, which Providers, how many Listings each.
 
-    Provider selection is added in ticket 02.
+    providers: names of the Providers to ask; None means every enabled Provider.
     """
 
     model_config = ConfigDict(frozen=True)
 
     query: SearchQuery
     limit: int = Field(default=DEFAULT_LIMIT, gt=0)
+    providers: frozenset[str] | None = None
 
 
 class OutcomeStatus(StrEnum):
