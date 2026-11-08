@@ -9,7 +9,7 @@ No app-level auth. LAN access is open by decision.
 
 **Blocked by:** 06, 10
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The image builds for x86-64, and the compose file starts the MCP server with a persistent config
 - [x] All settings listed in the spec can be set without rebuilding the image

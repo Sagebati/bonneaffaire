@@ -4,7 +4,7 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A Search can target all enabled Providers or an explicit subset
 - [x] Providers are queried concurrently, with a per-Provider timeout

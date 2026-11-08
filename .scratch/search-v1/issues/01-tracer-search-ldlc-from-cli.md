@@ -12,7 +12,7 @@ See spec: `.scratch/search-v1/spec.md`. Use GLOSSARY.md terms.
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A CLI search command with keywords returns LDLC Listings, as a table by default and as JSON with a flag
 - [x] Each Listing has Provider, Provider ID, title, URL, thumbnail, Price in integer cents plus currency, Condition (New) with the raw label, and Seller kind (Professional)

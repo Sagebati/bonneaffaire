@@ -6,7 +6,7 @@ Owner action: create an eBay developer account and production keys.
 
 **Blocked by:** 02, 03, 05
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
 - [ ] With credentials configured, a keyword Search and a Filtered Search return eBay Listings via the CLI (passes against doc-sample fixtures; live check waits for the owner's credentials)
 - [ ] Listing details work for an eBay Listing (passes against fixtures, by Provider ID and by URL; live check waits for credentials)
@@ -15,3 +15,7 @@ Owner action: create an eBay developer account and production keys.
 - [x] Rate-limit and auth errors produce clear Provider outcomes
 - [x] Without credentials, eBay is reported as disabled rather than failing every Search
 - [x] A live canary test for eBay exists, excluded from the default run
+
+## Comments
+
+Implemented and merged on `search-v1`. The two unticked criteria need real eBay credentials (`BONNEAFFAIRE_EBAY_CLIENT_ID` / `BONNEAFFAIRE_EBAY_CLIENT_SECRET`): owner to create keys, then run `uv run pytest -m canary -k ebay` and a CLI Search to verify and close.

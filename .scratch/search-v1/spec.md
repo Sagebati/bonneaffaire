@@ -1,6 +1,6 @@
 # Spec: Search v1
 
-Status: ready-for-agent
+Status: resolved
 
 ## Problem Statement
 

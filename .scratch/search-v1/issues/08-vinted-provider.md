@@ -9,7 +9,7 @@ Vinted's buyer protection is captured as a Buyer fee, so Total cost is computed 
 
 **Blocked by:** 02, 03, 04, 05
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A keyword Search, a Filtered Search, and a pasted Vinted URL all return Vinted Listings via the CLI
 - [x] Listing details work for a Vinted Listing

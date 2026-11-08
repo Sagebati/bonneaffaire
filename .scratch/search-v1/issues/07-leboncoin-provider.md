@@ -9,7 +9,7 @@ Listings carry Seller kind (Private or Professional), Shipping where offered, lo
 
 **Blocked by:** 02, 03, 04, 05
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A keyword Search, a Filtered Search, and a pasted Leboncoin URL all return Leboncoin Listings via the CLI
 - [x] Listing details work for a Leboncoin Listing

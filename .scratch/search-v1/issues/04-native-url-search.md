@@ -4,7 +4,7 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Providers declare whether they accept Native URLs and how to recognise their own
 - [x] Pasting an LDLC search URL into the CLI returns the same Listings as the equivalent keyword Search

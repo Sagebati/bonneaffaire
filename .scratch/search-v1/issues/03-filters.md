@@ -4,7 +4,7 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A price range and Condition Filter exclude non-matching Listings, whether the Provider applies them natively or the core applies them locally
 - [x] The response states, for each Provider, which Filters were applied natively and which locally

@@ -4,7 +4,7 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The CLI command fetches details for an LDLC Listing, by Provider plus ID and by URL
 - [x] Details include description, photos, attributes (e.g. EAN) and availability where the Provider exposes them

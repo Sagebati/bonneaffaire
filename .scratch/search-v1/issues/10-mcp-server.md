@@ -9,7 +9,7 @@ Results are compact, consistent JSON, including Provider outcomes and the Filter
 
 **Blocked by:** 02, 03, 04, 05
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] An MCP client can call Search, Get Listing and List Providers over Streamable HTTP
 - [x] Tool input schemas describe Filters, Condition values, Provider names and Native URL clearly enough for an agent to build valid requests

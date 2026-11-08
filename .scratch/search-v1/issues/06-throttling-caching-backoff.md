@@ -7,7 +7,7 @@
 
 **Blocked by:** 02
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Concurrent Searches never exceed a Provider's configured request rate
 - [x] A repeated identical Search within the cache window makes no Provider requests and returns the same result
