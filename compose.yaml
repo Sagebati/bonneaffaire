@@ -1,0 +1,29 @@
+# bonneaffaire on the Synology (Container Manager > Project). See docs/deployment.md.
+# Settings live in .env next to this file: edit it and restart the project, no rebuild needed.
+
+services:
+  bonneaffaire:
+    build: .
+    image: bonneaffaire:latest
+    container_name: bonneaffaire
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      BONNEAFFAIRE_HOST: 0.0.0.0
+      BONNEAFFAIRE_PORT: 8000
+    ports:
+      # LAN access is open by decision; remove this mapping to reach it only via the tunnel.
+      - "8000:8000"
+    mem_limit: 512m
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: bonneaffaire-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}
+    depends_on:
+      bonneaffaire:
+        condition: service_healthy
+    mem_limit: 128m
