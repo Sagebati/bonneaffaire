@@ -11,8 +11,8 @@ Listings carry Seller kind (Private or Professional), Shipping where offered, lo
 
 **Status:** ready-for-agent
 
-- [ ] A keyword Search, a Filtered Search, and a pasted Leboncoin URL all return Leboncoin Listings via the CLI
-- [ ] Listing details work for a Leboncoin Listing
-- [ ] Condition, Seller kind, Price in cents, Shipping and location are mapped correctly in fixture tests built from recorded responses injected into the library's HTTP client
-- [ ] A recorded DataDome 403 produces outcome blocked
-- [ ] A live canary test for Leboncoin exists, excluded from the default run
+- [x] A keyword Search, a Filtered Search, and a pasted Leboncoin URL all return Leboncoin Listings via the CLI
+- [x] Listing details work for a Leboncoin Listing
+- [x] Condition, Seller kind, Price in cents, Shipping and location are mapped correctly in fixture tests built from recorded responses injected into the library's HTTP client
+- [x] A recorded DataDome 403 produces outcome blocked
+- [x] A live canary test for Leboncoin exists, excluded from the default run

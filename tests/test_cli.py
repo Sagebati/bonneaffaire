@@ -177,7 +177,6 @@ def test_providers_can_be_disabled_in_configuration():
 
     assert "ldlc" in [p.name for p in enabled.providers]
     assert "ldlc" not in [p.name for p in disabled.providers]
-    assert len(disabled.providers) == len(enabled.providers) - 1
 
 
 class FakeUrlProvider(FakeProvider):

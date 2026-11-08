@@ -1,6 +1,7 @@
 """The `bonneaffaire` command: a thin adapter over the core."""
 
 import asyncio
+import json
 from collections.abc import Callable
 from decimal import Decimal, InvalidOperation
 from typing import Annotated
@@ -19,15 +20,21 @@ from bonneaffaire.models import (
     ListingStatus,
     Location,
     Money,
+    ProviderInfo,
     SearchQuery,
     SearchRequest,
     SearchResult,
     Sort,
 )
 from bonneaffaire.registry import default_core
+from bonneaffaire.server import DEFAULT_HOST, DEFAULT_PORT
+from bonneaffaire.server import serve as serve_mcp
 
 
-def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.Typer:
+def make_app(
+    core_factory: Callable[[], Bonneaffaire] = default_core,
+    serve: Callable[[str, int, Callable[[], Bonneaffaire]], None] = serve_mcp,
+) -> typer.Typer:
     app = typer.Typer(no_args_is_help=True, add_completion=False)
 
     @app.callback()
@@ -41,8 +48,15 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
             typer.Argument(help="What to look for, or a Native URL copied from a Provider."),
         ],
         limit: Annotated[
-            int, typer.Option(min=1, help="Maximum Listings per Provider.")
-        ] = DEFAULT_LIMIT,
+            int | None,
+            typer.Option(
+                min=1,
+                help=(
+                    "Maximum Listings per Provider. Default: BONNEAFFAIRE_DEFAULT_LIMIT, "
+                    f"else {DEFAULT_LIMIT}."
+                ),
+            ),
+        ] = None,
         providers: Annotated[
             list[str] | None,
             typer.Option(
@@ -127,7 +141,54 @@ def make_app(core_factory: Callable[[], Bonneaffaire] = default_core) -> typer.T
             typer.echo(f"{reason} ({result.status}): {result.message}", err=True)
             raise typer.Exit(1)
 
+    @app.command()
+    def providers(
+        as_json: Annotated[bool, typer.Option("--json", help="Print JSON.")] = False,
+    ) -> None:
+        """List Providers and what each supports."""
+        infos = core_factory().list_providers()
+        if as_json:
+            typer.echo(json.dumps([info.model_dump(mode="json") for info in infos], indent=2))
+        else:
+            print_providers(infos)
+
+    @app.command("serve")
+    def serve_command(
+        host: Annotated[
+            str, typer.Option(envvar="BONNEAFFAIRE_HOST", help="Address to listen on.")
+        ] = DEFAULT_HOST,
+        port: Annotated[
+            int, typer.Option(envvar="BONNEAFFAIRE_PORT", min=1, max=65535, help="Port.")
+        ] = DEFAULT_PORT,
+    ) -> None:
+        """Run the MCP server over Streamable HTTP at http://HOST:PORT/mcp."""
+        serve(host, port, core_factory)
+
     return app
+
+
+def print_providers(infos: list[ProviderInfo]) -> None:
+    table = Table(
+        "Provider",
+        "Country",
+        "Status",
+        "Native Filters",
+        "Native URLs",
+        "Listing details",
+        "Extras",
+        box=None,
+    )
+    for info in infos:
+        table.add_row(
+            info.name,
+            info.country,
+            "enabled" if info.enabled else "disabled",
+            ", ".join(info.native_filters) or "-",
+            "yes" if info.native_urls else "no",
+            "yes" if info.listing_details else "no",
+            ", ".join(info.extras) or "-",
+        )
+    Console().print(table)
 
 
 def print_details(details: ListingDetails) -> None:

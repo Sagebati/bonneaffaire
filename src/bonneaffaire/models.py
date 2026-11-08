@@ -192,12 +192,13 @@ class SearchRequest(BaseModel):
     """A Search as the caller asks it: the query, which Providers, how many Listings each.
 
     providers: names of the Providers to ask; None means every enabled Provider.
+    limit: Listings per Provider; None means the core's configured default limit.
     """
 
     model_config = ConfigDict(frozen=True)
 
     query: SearchQuery
-    limit: int = Field(default=DEFAULT_LIMIT, gt=0)
+    limit: int | None = Field(default=None, gt=0)
     providers: frozenset[str] | None = None
 
 
@@ -230,6 +231,24 @@ class FilterReport(BaseModel):
     local: list[FilterName] = Field(default_factory=list)
     unapplied: list[FilterName] = Field(default_factory=list)
     ignored_extras: list[str] = Field(default_factory=list)
+
+
+class ProviderInfo(BaseModel):
+    """One Provider as List Providers shows it: what it supports and whether it is enabled.
+
+    native_filters: canonical Filters it applies itself; the core applies the others locally.
+    native_urls: whether a Search can take a Native URL copied from its website.
+    listing_details: whether Get Listing works for its Listings.
+    extras: names of the Provider-specific extras it accepts.
+    """
+
+    name: str
+    country: str
+    enabled: bool
+    native_filters: list[FilterName]
+    native_urls: bool
+    listing_details: bool
+    extras: list[str]
 
 
 class SearchResult(BaseModel):
