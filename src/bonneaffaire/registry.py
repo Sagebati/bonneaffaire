@@ -20,6 +20,7 @@ PROVIDER_RATES_VARIABLE = "BONNEAFFAIRE_PROVIDER_RATES"
 CACHE_VARIABLE = "BONNEAFFAIRE_CACHE_SECONDS"
 BACKOFF_VARIABLE = "BONNEAFFAIRE_BACKOFF_SECONDS"
 TIMEOUT_VARIABLE = "BONNEAFFAIRE_TIMEOUT_SECONDS"
+PROVIDER_TIMEOUTS_VARIABLE = "BONNEAFFAIRE_PROVIDER_TIMEOUTS"
 LIMIT_VARIABLE = "BONNEAFFAIRE_DEFAULT_LIMIT"
 
 DEFAULT_RATE_PER_MINUTE = 20.0
@@ -51,6 +52,7 @@ def default_core(
     BONNEAFFAIRE_EBAY_CLIENT_ID, BONNEAFFAIRE_EBAY_CLIENT_SECRET: the eBay application's
     production App ID and Cert ID; eBay is disabled without them.
     BONNEAFFAIRE_TIMEOUT_SECONDS: seconds each Provider gets to answer (default 20).
+    BONNEAFFAIRE_PROVIDER_TIMEOUTS: per-Provider overrides, e.g. "leboncoin=30,ldlc=10".
     BONNEAFFAIRE_DEFAULT_LIMIT: Listings per Provider when a Search names no limit (default 50).
     Politeness variables: see `politeness_from`.
     providers: the known Providers; `default_providers(environ)` when None.
@@ -72,6 +74,7 @@ def default_core(
         timeout=_number(
             TIMEOUT_VARIABLE, environ.get(TIMEOUT_VARIABLE), DEFAULT_TIMEOUT, positive=True
         ),
+        timeouts=_per_provider(PROVIDER_TIMEOUTS_VARIABLE, environ),
         default_limit=_whole_number(LIMIT_VARIABLE, environ.get(LIMIT_VARIABLE), DEFAULT_LIMIT),
         politeness=politeness_from(environ),
     )
@@ -86,16 +89,8 @@ def politeness_from(environ: Mapping[str, str]) -> Politeness:
     (default 120; 0 disables the cache).
     BONNEAFFAIRE_BACKOFF_SECONDS: how long a blocked Provider is left alone (default 600).
     """
-    rates: dict[str, float] = {}
-    for entry in environ.get(PROVIDER_RATES_VARIABLE, "").split(","):
-        if not entry.strip():
-            continue
-        name, sep, value = entry.partition("=")
-        if not sep or not name.strip():
-            raise ValueError(f"{PROVIDER_RATES_VARIABLE}: expected name=rate, got {entry!r}")
-        rates[name.strip()] = _number(PROVIDER_RATES_VARIABLE, value, positive=True)
     return Politeness(
-        rates=rates,
+        rates=_per_provider(PROVIDER_RATES_VARIABLE, environ),
         default_rate=_number(
             RATE_VARIABLE, environ.get(RATE_VARIABLE), DEFAULT_RATE_PER_MINUTE, positive=True
         ),
@@ -104,6 +99,19 @@ def politeness_from(environ: Mapping[str, str]) -> Politeness:
             BACKOFF_VARIABLE, environ.get(BACKOFF_VARIABLE), DEFAULT_BACKOFF_SECONDS
         ),
     )
+
+
+def _per_provider(variable: str, environ: Mapping[str, str]) -> dict[str, float]:
+    """Comma-separated name=number entries, each number strictly positive."""
+    values: dict[str, float] = {}
+    for entry in environ.get(variable, "").split(","):
+        if not entry.strip():
+            continue
+        name, sep, value = entry.partition("=")
+        if not sep or not name.strip():
+            raise ValueError(f"{variable}: expected name=number, got {entry!r}")
+        values[name.strip()] = _number(variable, value, positive=True)
+    return values
 
 
 def _number(

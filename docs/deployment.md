@@ -24,6 +24,7 @@ All settings are environment variables read when the server starts. They live in
 | `CLOUDFLARE_TUNNEL_TOKEN` | required | Token of the Cloudflare Tunnel (step 3). Used only by the `cloudflared` container. |
 | `BONNEAFFAIRE_DISABLED_PROVIDERS` | empty | Comma-separated Provider names to switch off, e.g. `vinted,ebay`. Disabled Providers still appear in `list_providers` with `enabled: false`. |
 | `BONNEAFFAIRE_TIMEOUT_SECONDS` | `20` | Seconds each Provider gets to answer one Search or Get Listing. Time spent waiting on the throttle is not counted. |
+| `BONNEAFFAIRE_PROVIDER_TIMEOUTS` | empty | Per-Provider timeout overrides in seconds, e.g. `leboncoin=30,ldlc=10`. Providers not listed use `BONNEAFFAIRE_TIMEOUT_SECONDS`. |
 | `BONNEAFFAIRE_DEFAULT_LIMIT` | `50` | Listings per Provider when a Search doesn't give a `limit`. |
 | `BONNEAFFAIRE_RATE_PER_MINUTE` | `20` | Requests per minute to each Provider. |
 | `BONNEAFFAIRE_PROVIDER_RATES` | empty | Per-Provider rate overrides, e.g. `ldlc=30,leboncoin=5`. |

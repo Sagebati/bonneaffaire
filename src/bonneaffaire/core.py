@@ -55,6 +55,7 @@ class Bonneaffaire:
         enabled: Iterable[str] | None = None,
         disabled: Mapping[str, str] | None = None,
         timeout: float = DEFAULT_TIMEOUT,
+        timeouts: Mapping[str, float] | None = None,
         default_limit: int = DEFAULT_LIMIT,
         politeness: Politeness | None = None,
         clock: Clock | None = None,
@@ -63,7 +64,9 @@ class Bonneaffaire:
 
         disabled: Provider name to the reason it is off (e.g. missing credentials), reported
         when someone asks for it and by List Providers.
-        timeout: seconds each Provider gets to answer one Search (throttling waits excluded).
+        timeout: seconds each Provider gets to answer one Search or Get Listing (throttling
+        waits excluded).
+        timeouts: Provider name to its own timeout, overriding `timeout` for that Provider.
         default_limit: Listings per Provider when a Search request names no limit.
         politeness: throttling, caching and backoff; the default switches them all off.
         clock: time source for politeness; the system clock by default.
@@ -77,6 +80,7 @@ class Bonneaffaire:
         }
         self._disabled = dict(disabled or {})
         self._timeout = timeout
+        self._timeouts = dict(timeouts or {})
         self._default_limit = default_limit
         self._guard = Guard(politeness or Politeness(), clock or SystemClock())
 
@@ -165,14 +169,16 @@ class Bonneaffaire:
     async def _get_listing(
         self, provider: ListingDetailsProvider, provider_id: str
     ) -> ListingResult:
+        timeout = self._timeout_for(provider)
+
         async def fetch() -> ListingDetails:
-            async with asyncio.timeout(self._timeout):
+            async with asyncio.timeout(timeout):
                 return await provider.get_listing(provider_id)
 
         try:
             listing = await self._guard.request(provider.name, fetch)
         except Exception as exc:
-            status, message = _failure(exc, self._timeout)
+            status, message = _failure(exc, timeout)
             return ListingResult(status=status, provider=provider.name, message=message)
         return ListingResult(status=ListingStatus.OK, provider=provider.name, listing=listing)
 
@@ -186,20 +192,25 @@ class Bonneaffaire:
                 provider=provider.name, status=status, listing_count=count, message=message
             )
 
+        timeout = self._timeout_for(provider)
+
         async def ask() -> list[Listing]:
-            async with asyncio.timeout(self._timeout):
+            async with asyncio.timeout(timeout):
                 return await provider.search(query, limit)
 
         try:
             answer = await self._guard.request(provider.name, ask, key=_cache_key(query, limit))
         except Exception as exc:
-            status, message = _failure(exc, self._timeout)
+            status, message = _failure(exc, timeout)
             # A Search has no Listing to be missing: not found is that Provider's failure.
             return [], outcome(OUTCOME_STATUSES.get(status, OutcomeStatus.FAILED), message)
         if not isinstance(answer, list) or not all(isinstance(i, Listing) for i in answer):
             return [], outcome(OutcomeStatus.FAILED, "unexpected response shape")
         listings = answer[:limit]
         return listings, outcome(OutcomeStatus.OK, count=len(listings))
+
+    def _timeout_for(self, provider: Provider) -> float:
+        return self._timeouts.get(provider.name, self._timeout)
 
     def _select(self, names: frozenset[str] | None) -> list[Provider]:
         if names is None:

@@ -127,7 +127,8 @@ class SlowProvider:
     country = "FR"
     capabilities = Capabilities()
 
-    def __init__(self, delay: float = 0.0) -> None:
+    def __init__(self, delay: float = 0.0, name: str = "slow") -> None:
+        self.name = name
         self.delay = delay
         self.limits: list[int] = []
 
@@ -147,6 +148,19 @@ async def test_provider_timeout_is_configurable():
     result = await core.search(keyword_search())
 
     assert result.outcomes[0].status == OutcomeStatus.TIMED_OUT
+
+
+async def test_each_provider_can_have_its_own_timeout_falling_back_to_the_default():
+    environ = {"BONNEAFFAIRE_TIMEOUT_SECONDS": "5", "BONNEAFFAIRE_PROVIDER_TIMEOUTS": "slow=0.01"}
+    core = default_core(environ, providers=[SlowProvider(0.2), SlowProvider(0.2, name="steady")])
+
+    result = await core.search(keyword_search())
+
+    assert {o.provider: o.status for o in result.outcomes} == {
+        "slow": OutcomeStatus.TIMED_OUT,
+        "steady": OutcomeStatus.OK,
+    }
+    assert "0.01s" in (result.outcomes[0].message or "")
 
 
 async def test_default_limit_is_configurable_and_a_requested_limit_wins():
@@ -172,6 +186,8 @@ async def test_default_limit_is_fifty():
     ("variable", "value"),
     [
         ("BONNEAFFAIRE_TIMEOUT_SECONDS", "0"),
+        ("BONNEAFFAIRE_PROVIDER_TIMEOUTS", "ldlc"),
+        ("BONNEAFFAIRE_PROVIDER_TIMEOUTS", "ldlc=0"),
         ("BONNEAFFAIRE_DEFAULT_LIMIT", "2.5"),
         ("BONNEAFFAIRE_DEFAULT_LIMIT", "0"),
     ],
