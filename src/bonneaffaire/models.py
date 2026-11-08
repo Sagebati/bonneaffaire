@@ -192,12 +192,13 @@ class SearchRequest(BaseModel):
     """A Search as the caller asks it: the query, which Providers, how many Listings each.
 
     providers: names of the Providers to ask; None means every enabled Provider.
+    limit: Listings per Provider; None means the core's configured default limit.
     """
 
     model_config = ConfigDict(frozen=True)
 
     query: SearchQuery
-    limit: int = Field(default=DEFAULT_LIMIT, gt=0)
+    limit: int | None = Field(default=None, gt=0)
     providers: frozenset[str] | None = None
 
 

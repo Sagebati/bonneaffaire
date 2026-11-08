@@ -48,8 +48,15 @@ def make_app(
             typer.Argument(help="What to look for, or a Native URL copied from a Provider."),
         ],
         limit: Annotated[
-            int, typer.Option(min=1, help="Maximum Listings per Provider.")
-        ] = DEFAULT_LIMIT,
+            int | None,
+            typer.Option(
+                min=1,
+                help=(
+                    "Maximum Listings per Provider. Default: BONNEAFFAIRE_DEFAULT_LIMIT, "
+                    f"else {DEFAULT_LIMIT}."
+                ),
+            ),
+        ] = None,
         providers: Annotated[
             list[str] | None,
             typer.Option(

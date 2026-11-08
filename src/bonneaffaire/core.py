@@ -6,6 +6,7 @@ from typing import TypeIs
 
 from bonneaffaire.filters import apply_locally, plan
 from bonneaffaire.models import (
+    DEFAULT_LIMIT,
     FilterName,
     Listing,
     ListingDetails,
@@ -53,12 +54,14 @@ class Bonneaffaire:
         *,
         enabled: Iterable[str] | None = None,
         timeout: float = DEFAULT_TIMEOUT,
+        default_limit: int = DEFAULT_LIMIT,
         politeness: Politeness | None = None,
         clock: Clock | None = None,
     ) -> None:
         """enabled: names of the Providers to keep; None keeps them all. Others are ignored.
 
         timeout: seconds each Provider gets to answer one Search (throttling waits excluded).
+        default_limit: Listings per Provider when a Search request names no limit.
         politeness: throttling, caching and backoff; the default switches them all off.
         clock: time source for politeness; the system clock by default.
         """
@@ -70,6 +73,7 @@ class Bonneaffaire:
             if keep is None or provider.name in keep
         }
         self._timeout = timeout
+        self._default_limit = default_limit
         self._guard = Guard(politeness or Politeness(), clock or SystemClock())
 
     @property
@@ -101,9 +105,10 @@ class Bonneaffaire:
         plans = [
             plan(provider.name, provider.capabilities, request.query) for provider in providers
         ]
+        limit = self._default_limit if request.limit is None else request.limit
         answers = await asyncio.gather(
             *(
-                self._ask(provider, query, request.limit)
+                self._ask(provider, query, limit)
                 for provider, (query, _) in zip(providers, plans, strict=True)
             )
         )

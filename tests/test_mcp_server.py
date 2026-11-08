@@ -8,6 +8,7 @@ from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from typing import Any
 
+import httpx
 import uvicorn
 from mcp import Client
 from mcp.types import CallToolResult, TextContent
@@ -210,6 +211,14 @@ async def test_an_mcp_client_calls_the_tools_over_streamable_http():
 
     assert payload(providers)["providers"][0]["name"] == "shop"
     assert payload(found)["listings"][0]["provider_id"] == "PB1"
+
+
+def test_health_check_reports_the_service_is_up():
+    with running_server(lambda: Bonneaffaire([FakeShop()])) as url:
+        response = httpx.get(url.removesuffix("/mcp") + "/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok", "enabled_providers": ["shop"]}
 
 
 @contextmanager
