@@ -29,8 +29,8 @@ All settings are environment variables read when the server starts. They live in
 | `BONNEAFFAIRE_PROVIDER_RATES` | empty | Per-Provider rate overrides, e.g. `ldlc=30,leboncoin=5`. |
 | `BONNEAFFAIRE_CACHE_SECONDS` | `120` | How long an identical Search is answered from cache. `0` turns the cache off. |
 | `BONNEAFFAIRE_BACKOFF_SECONDS` | `600` | How long a blocked Provider is left alone before it is asked again. |
-| `BONNEAFFAIRE_EBAY_CLIENT_ID` | empty | eBay Browse API client ID (App ID). **Placeholder**: the eBay Provider ticket (09) fixes the final names. |
-| `BONNEAFFAIRE_EBAY_CLIENT_SECRET` | empty | eBay Browse API client secret (Cert ID). **Placeholder**, as above. |
+| `BONNEAFFAIRE_EBAY_CLIENT_ID` | empty | eBay Browse API client ID (App ID). eBay is disabled unless both are set. |
+| `BONNEAFFAIRE_EBAY_CLIENT_SECRET` | empty | eBay Browse API client secret (Cert ID). See the client ID. |
 | `BONNEAFFAIRE_HOST` / `BONNEAFFAIRE_PORT` | `0.0.0.0` / `8000` | Listen address inside the container. `compose.yaml` sets these, so leave them alone. |
 
 A malformed value (e.g. `BONNEAFFAIRE_DEFAULT_LIMIT=lots`) stops the server at startup with an error naming the variable. You can read it in the container log.

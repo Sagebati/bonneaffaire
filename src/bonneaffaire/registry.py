@@ -7,11 +7,14 @@ from bonneaffaire.core import DEFAULT_TIMEOUT, Bonneaffaire
 from bonneaffaire.models import DEFAULT_LIMIT
 from bonneaffaire.politeness import Politeness
 from bonneaffaire.providers import Provider
+from bonneaffaire.providers.ebay import EbayCredentials, ebay
 from bonneaffaire.providers.ldlc import ldlc
 from bonneaffaire.providers.leboncoin import leboncoin
 from bonneaffaire.providers.vinted import vinted
 
 DISABLED_PROVIDERS_VARIABLE = "BONNEAFFAIRE_DISABLED_PROVIDERS"
+EBAY_CLIENT_ID_VARIABLE = "BONNEAFFAIRE_EBAY_CLIENT_ID"
+EBAY_CLIENT_SECRET_VARIABLE = "BONNEAFFAIRE_EBAY_CLIENT_SECRET"
 RATE_VARIABLE = "BONNEAFFAIRE_RATE_PER_MINUTE"
 PROVIDER_RATES_VARIABLE = "BONNEAFFAIRE_PROVIDER_RATES"
 CACHE_VARIABLE = "BONNEAFFAIRE_CACHE_SECONDS"
@@ -24,8 +27,19 @@ DEFAULT_CACHE_SECONDS = 120.0
 DEFAULT_BACKOFF_SECONDS = 600.0
 
 
-def default_providers() -> list[Provider]:
-    return [ldlc(), leboncoin(), vinted()]
+def default_providers(
+    environ: Mapping[str, str] = os.environ,
+) -> tuple[list[Provider], dict[str, str]]:
+    """Every Provider, and why those that cannot run with this configuration cannot."""
+    unavailable: dict[str, str] = {}
+    client_id = environ.get(EBAY_CLIENT_ID_VARIABLE, "").strip()
+    client_secret = environ.get(EBAY_CLIENT_SECRET_VARIABLE, "").strip()
+    credentials = EbayCredentials(client_id, client_secret) if client_id and client_secret else None
+    if credentials is None:
+        unavailable["ebay"] = (
+            f"no eBay credentials: set {EBAY_CLIENT_ID_VARIABLE} and {EBAY_CLIENT_SECRET_VARIABLE}"
+        )
+    return [ldlc(), leboncoin(), vinted(), ebay(credentials)], unavailable
 
 
 def default_core(
@@ -34,16 +48,27 @@ def default_core(
     """Build the core from configuration.
 
     BONNEAFFAIRE_DISABLED_PROVIDERS: comma-separated Provider names to switch off.
+    BONNEAFFAIRE_EBAY_CLIENT_ID, BONNEAFFAIRE_EBAY_CLIENT_SECRET: the eBay application's
+    production App ID and Cert ID; eBay is disabled without them.
     BONNEAFFAIRE_TIMEOUT_SECONDS: seconds each Provider gets to answer (default 20).
     BONNEAFFAIRE_DEFAULT_LIMIT: Listings per Provider when a Search names no limit (default 50).
     Politeness variables: see `politeness_from`.
-    providers: the known Providers; `default_providers()` when None.
+    providers: the known Providers; `default_providers(environ)` when None.
     """
-    disabled = {name.strip() for name in environ.get(DISABLED_PROVIDERS_VARIABLE, "").split(",")}
-    providers = default_providers() if providers is None else providers
+    switched_off = {
+        name.strip() for name in environ.get(DISABLED_PROVIDERS_VARIABLE, "").split(",")
+    }
+    if providers is None:
+        providers, disabled = default_providers(environ)
+    else:
+        disabled = {}
+    for provider in providers:
+        if provider.name in switched_off:
+            disabled[provider.name] = f"switched off in {DISABLED_PROVIDERS_VARIABLE}"
     return Bonneaffaire(
         providers,
         enabled=[p.name for p in providers if p.name not in disabled],
+        disabled=disabled,
         timeout=_number(
             TIMEOUT_VARIABLE, environ.get(TIMEOUT_VARIABLE), DEFAULT_TIMEOUT, positive=True
         ),

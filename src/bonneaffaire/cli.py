@@ -188,7 +188,11 @@ def print_providers(infos: list[ProviderInfo]) -> None:
             "yes" if info.listing_details else "no",
             ", ".join(info.extras) or "-",
         )
-    Console().print(table)
+    console = Console()
+    console.print(table)
+    for info in infos:
+        if info.disabled_reason:
+            console.print(f"{info.name}: disabled, {info.disabled_reason}", markup=False)
 
 
 def print_details(details: ListingDetails) -> None:

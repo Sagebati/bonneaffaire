@@ -185,6 +185,7 @@ async def test_list_providers_derives_from_provider_capabilities():
                 "native_urls": True,
                 "listing_details": True,
                 "extras": ["category"],
+                "disabled_reason": None,
             }
         ]
     }
