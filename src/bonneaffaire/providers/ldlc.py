@@ -3,9 +3,9 @@
 import httpx
 
 from bonneaffaire.models import Condition, SellerKind
-from bonneaffaire.providers.retail import Pick, RetailProvider, RetailSite, SearchPage
+from bonneaffaire.providers.retail import Pick, RetailProvider, RetailProviderConfig, SearchPage
 
-LDLC = RetailSite(
+LDLC = RetailProviderConfig(
     name="ldlc",
     country="FR",
     base_url="https://www.ldlc.com/",

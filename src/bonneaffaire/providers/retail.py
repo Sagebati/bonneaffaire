@@ -1,6 +1,6 @@
 """The config-driven generic retail Provider.
 
-A simple retail site is described by a RetailSite: how to build its search URL and which
+A simple retailer is described by a RetailProviderConfig: how to build its search URL and which
 CSS selectors pick Listings out of its server-rendered search page. If it also has a
 product page URL, Listing details are read from the schema.org Product/Offer JSON-LD that
 such pages carry, so a new retailer needs no details code of its own.
@@ -70,7 +70,9 @@ class SearchPage:
 
 
 @dataclass(frozen=True)
-class RetailSite:
+class RetailProviderConfig:
+    """Everything the generic retail Provider needs to know about one retailer."""
+
     name: str
     country: str
     base_url: str
@@ -84,30 +86,32 @@ class RetailSite:
     product_url: str | None = None
     """Template with a `{provider_id}` placeholder; set it to offer Listing details."""
     native_url_hosts: frozenset[str] = field(default_factory=frozenset)
-    """Hosts whose search pages this site accepts as Native URLs; empty means none."""
+    """Hosts whose search pages this Provider accepts as Native URLs; empty means none."""
     native_url_path_prefix: str = "/"
     """Path prefix that marks a search page on those hosts."""
     timeout_seconds: float = 15.0
 
 
 class RetailProvider:
-    def __init__(self, site: RetailSite, client: httpx.AsyncClient | None = None) -> None:
-        self.site = site
+    def __init__(
+        self, config: RetailProviderConfig, client: httpx.AsyncClient | None = None
+    ) -> None:
+        self.config = config
         self._client = client
 
     @property
     def name(self) -> str:
-        return self.site.name
+        return self.config.name
 
     @property
     def country(self) -> str:
-        return self.site.country
+        return self.config.country
 
     @property
     def capabilities(self) -> Capabilities:
         return Capabilities(
-            listing_details=self.site.product_url is not None,
-            native_urls=bool(self.site.native_url_hosts),
+            listing_details=self.config.product_url is not None,
+            native_urls=bool(self.config.native_url_hosts),
         )
 
     def recognises_native_url(self, url: str) -> bool:
@@ -117,8 +121,8 @@ class RetailProvider:
             return False
         return (
             parts.scheme in {"http", "https"}
-            and (parts.hostname or "") in self.site.native_url_hosts
-            and parts.path.startswith(self.site.native_url_path_prefix)
+            and (parts.hostname or "") in self.config.native_url_hosts
+            and parts.path.startswith(self.config.native_url_path_prefix)
         )
 
     async def search(self, query: SearchQuery, limit: int) -> list[Listing]:
@@ -127,22 +131,22 @@ class RetailProvider:
                 raise ProviderError(self.name, f"not a {self.name} Native URL: {query.native_url}")
             url = urldefrag(query.native_url).url
         else:
-            url = self.site.search_url.format(keywords=quote(query.keywords or "", safe=""))
+            url = self.config.search_url.format(keywords=quote(query.keywords or "", safe=""))
         html = await self._fetch(url)
         return self._parse_search_page(html)[:limit]
 
     def listing_id_from_url(self, url: str) -> str | None:
-        if self.site.product_url is None:
+        if self.config.product_url is None:
             return None
-        if urlsplit(url).netloc != urlsplit(self.site.base_url).netloc:
+        if urlsplit(url).netloc != urlsplit(self.config.base_url).netloc:
             return None
-        match = re.search(self.site.search_page.provider_id_pattern, url)
+        match = re.search(self.config.search_page.provider_id_pattern, url)
         return match.group(1) if match else None
 
     async def get_listing(self, provider_id: str) -> ListingDetails:
-        if self.site.product_url is None:
+        if self.config.product_url is None:
             raise ProviderError(self.name, "this Provider has no Listing details")
-        url = self.site.product_url.format(provider_id=quote(provider_id, safe=""))
+        url = self.config.product_url.format(provider_id=quote(provider_id, safe=""))
         response = await self._get(url)
         if response.status_code in GONE_STATUSES:
             raise ListingNotFound(self.name, f"no Listing {provider_id}")
@@ -166,7 +170,7 @@ class RetailProvider:
         if not isinstance(title, str) or not title.strip():
             raise UnexpectedShape(self.name, f"no JSON-LD product name on {url}")
         condition_term = _schema_term(offer.get("itemCondition"))
-        condition = SCHEMA_CONDITIONS.get(condition_term or "", self.site.condition)
+        condition = SCHEMA_CONDITIONS.get(condition_term or "", self.config.condition)
         photos = [image for image in map(_image_url, _as_list(product.get("image"))) if image]
         seller = offer.get("seller")
         return ListingDetails(
@@ -175,13 +179,15 @@ class RetailProvider:
             title=title.strip(),
             url=offer.get("url") or url,
             thumbnail=photos[0] if photos else None,
-            price=Money(cents=cents, currency=offer.get("priceCurrency") or self.site.currency),
+            price=Money(cents=cents, currency=offer.get("priceCurrency") or self.config.currency),
             condition=condition,
             condition_label=(
-                self.site.condition_label if condition == self.site.condition else condition_term
+                self.config.condition_label
+                if condition == self.config.condition
+                else condition_term
             ),
-            seller_kind=self.site.seller_kind,
-            buyer_fee=Money(cents=0, currency=offer.get("priceCurrency") or self.site.currency),
+            seller_kind=self.config.seller_kind,
+            buyer_fee=Money(cents=0, currency=offer.get("priceCurrency") or self.config.currency),
             attributes=json_ld_attributes(product),
             description=product.get("description"),
             photos=photos,
@@ -209,7 +215,7 @@ class RetailProvider:
             headers={"User-Agent": USER_AGENT, "Accept-Language": "fr-FR,fr;q=0.9"},
         )
         try:
-            return await client.get(url, timeout=self.site.timeout_seconds, follow_redirects=True)
+            return await client.get(url, timeout=self.config.timeout_seconds, follow_redirects=True)
         except httpx.TimeoutException as exc:
             raise ProviderTimeout(self.name, f"no answer from {url}") from exc
         except httpx.HTTPError as exc:
@@ -219,7 +225,7 @@ class RetailProvider:
                 await client.aclose()
 
     def _parse_search_page(self, html: str) -> list[Listing]:
-        page = self.site.search_page
+        page = self.config.search_page
         tree = HTMLParser(html)
         cards = tree.css(page.card)
         if not cards:
@@ -229,8 +235,8 @@ class RetailProvider:
         return [self._parse_card(card) for card in cards]
 
     def _parse_card(self, card: Node) -> Listing:
-        page = self.site.search_page
-        url = urljoin(self.site.base_url, self._require(card, page.link, "link"))
+        page = self.config.search_page
+        url = urljoin(self.config.base_url, self._require(card, page.link, "link"))
         match = re.search(page.provider_id_pattern, url)
         if match is None:
             raise UnexpectedShape(self.name, f"no Provider ID in {url}")
@@ -245,12 +251,12 @@ class RetailProvider:
             provider_id=match.group(1),
             title=self._require(card, page.title, "title"),
             url=url,
-            thumbnail=urljoin(self.site.base_url, thumbnail) if thumbnail else None,
+            thumbnail=urljoin(self.config.base_url, thumbnail) if thumbnail else None,
             price=self._price(self._require(card, page.price, "price")),
-            condition=self.site.condition,
-            condition_label=self.site.condition_label,
-            seller_kind=self.site.seller_kind,
-            buyer_fee=Money(cents=0, currency=self.site.currency),
+            condition=self.config.condition,
+            condition_label=self.config.condition_label,
+            seller_kind=self.config.seller_kind,
+            buyer_fee=Money(cents=0, currency=self.config.currency),
             attributes=attributes,
         )
 
@@ -258,7 +264,7 @@ class RetailProvider:
         cents = parse_price_cents(text)
         if cents is None:
             raise UnexpectedShape(self.name, f"unreadable price {text!r}")
-        return Money(cents=cents, currency=self.site.currency)
+        return Money(cents=cents, currency=self.config.currency)
 
     def _require(self, card: Node, pick: Pick, what: str) -> str:
         value = self._pick(card, pick)
