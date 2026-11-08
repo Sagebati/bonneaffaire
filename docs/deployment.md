@@ -58,7 +58,7 @@ docker build --platform linux/amd64 -t bonneaffaire:latest .
 docker save bonneaffaire:latest | ssh admin@nas sudo docker load
 ```
 
-Resource use: the image is about 190 MB and the server idles at about 60 MB of RAM. `compose.yaml` caps it at 512 MB and `cloudflared` at 128 MB.
+Resource use: the image is about 230 MB and the server idles at about 60 MB of RAM. `compose.yaml` caps it at 512 MB and `cloudflared` at 128 MB.
 
 ### Checking it runs
 
