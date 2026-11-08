@@ -12,6 +12,7 @@ from bonneaffaire.models import (
     SearchResult,
     Sort,
 )
+from bonneaffaire.politeness import Clock, Guard, Politeness, SystemClock
 from bonneaffaire.providers import (
     NativeUrlProvider,
     Provider,
@@ -42,10 +43,14 @@ class Bonneaffaire:
         *,
         enabled: Iterable[str] | None = None,
         timeout: float = DEFAULT_TIMEOUT,
+        politeness: Politeness | None = None,
+        clock: Clock | None = None,
     ) -> None:
         """enabled: names of the Providers to keep; None keeps them all. Others are ignored.
 
-        timeout: seconds each Provider gets to answer one Search.
+        timeout: seconds each Provider gets to answer one Search (throttling waits excluded).
+        politeness: throttling, caching and backoff; the default switches them all off.
+        clock: time source for politeness; the system clock by default.
         """
         keep = None if enabled is None else set(enabled)
         self._providers = {
@@ -54,6 +59,7 @@ class Bonneaffaire:
             if keep is None or provider.name in keep
         }
         self._timeout = timeout
+        self._guard = Guard(politeness or Politeness(), clock or SystemClock())
 
     @property
     def providers(self) -> list[Provider]:
@@ -85,9 +91,12 @@ class Bonneaffaire:
                 provider=provider.name, status=status, listing_count=count, message=message
             )
 
-        try:
+        async def ask() -> list[Listing]:
             async with asyncio.timeout(self._timeout):
-                answer = await provider.search(request.query, request.limit)
+                return await provider.search(request.query, request.limit)
+
+        try:
+            answer = await self._guard.request(provider.name, ask, key=_cache_key(request))
         except ProviderBlocked as exc:
             return [], outcome(OutcomeStatus.BLOCKED, exc.message)
         except ProviderTimeout as exc:
@@ -126,6 +135,13 @@ class Bonneaffaire:
             if provider.recognises_native_url(url):
                 return [provider]
         raise UnrecognisedNativeUrl(url, [provider.name for provider in accepting])
+
+
+def _cache_key(request: SearchRequest) -> str:
+    """The normalised request one Provider is asked: the whole query (keywords or Native URL,
+    Filters, sort) and the limit. Provider selection is left out: each Provider caches its
+    own answers."""
+    return request.model_dump_json(include={"query", "limit"})
 
 
 def sort_listings(listings: list[Listing], order: Sort) -> list[Listing]:
