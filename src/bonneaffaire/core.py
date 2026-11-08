@@ -1,7 +1,7 @@
 """The core library: the single entry point the CLI and the MCP server adapt."""
 
 import asyncio
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from typing import TypeIs
 
 from bonneaffaire.filters import apply_locally, plan
@@ -48,10 +48,13 @@ class Bonneaffaire:
         providers: Iterable[Provider],
         *,
         enabled: Iterable[str] | None = None,
+        disabled: Mapping[str, str] | None = None,
         timeout: float = DEFAULT_TIMEOUT,
     ) -> None:
         """enabled: names of the Providers to keep; None keeps them all. Others are ignored.
 
+        disabled: Provider name to the reason it is off (e.g. missing credentials), reported
+        when someone asks for it.
         timeout: seconds each Provider gets to answer one Search.
         """
         keep = None if enabled is None else set(enabled)
@@ -60,7 +63,13 @@ class Bonneaffaire:
             for provider in providers
             if keep is None or provider.name in keep
         }
+        self._disabled = dict(disabled or {})
         self._timeout = timeout
+
+    @property
+    def disabled(self) -> dict[str, str]:
+        """Providers that exist but are switched off, with the reason for each."""
+        return dict(self._disabled)
 
     @property
     def providers(self) -> list[Provider]:
@@ -174,7 +183,7 @@ class Bonneaffaire:
             return self.providers
         unknown = names - self._providers.keys()
         if unknown:
-            raise UnknownProvider(sorted(unknown))
+            raise UnknownProvider(sorted(unknown), self._disabled)
         return [provider for provider in self.providers if provider.name in names]
 
     def _providers_for(self, query: SearchQuery, selected: list[Provider]) -> list[Provider]:
@@ -211,6 +220,8 @@ def sort_listings(listings: list[Listing], order: Sort) -> list[Listing]:
 class UnknownProvider(ValueError):
     """The request names Providers that do not exist or are not enabled."""
 
-    def __init__(self, names: list[str]) -> None:
-        super().__init__(f"Unknown or disabled Providers: {', '.join(names)}")
+    def __init__(self, names: list[str], reasons: Mapping[str, str] | None = None) -> None:
+        reasons = reasons or {}
+        described = [f"{name} ({reasons[name]})" if name in reasons else name for name in names]
+        super().__init__(f"Unknown or disabled Providers: {', '.join(described)}")
         self.names = names

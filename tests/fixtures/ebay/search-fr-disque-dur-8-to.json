@@ -1,0 +1,204 @@
+{
+  "href": "https://api.ebay.com/buy/browse/v1/item_summary/search?q=disque+dur+8+To&limit=50&offset=0",
+  "total": 5,
+  "limit": 50,
+  "offset": 0,
+  "itemSummaries": [
+    {
+      "itemId": "v1|306123456789|0",
+      "title": "Seagate IronWolf 8 To NAS ST8000VN004",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/g/AAAAAAAAAAAAAAAA/s-l225.jpg"
+      },
+      "price": {
+        "value": "189.90",
+        "currency": "EUR"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|306123456789|0",
+      "seller": {
+        "username": "pro-stockage",
+        "feedbackPercentage": "99.8",
+        "feedbackScore": 15422,
+        "sellerAccountType": "BUSINESS"
+      },
+      "condition": "Neuf",
+      "conditionId": "1000",
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "0.00",
+            "currency": "EUR"
+          }
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "itemWebUrl": "https://www.ebay.fr/itm/306123456789",
+      "itemLocation": {
+        "postalCode": "75***",
+        "country": "FR"
+      },
+      "itemCreationDate": "2026-10-30T09:12:00.000Z",
+      "legacyItemId": "306123456789",
+      "listingMarketplaceId": "EBAY_FR"
+    },
+    {
+      "itemId": "v1|126234567890|0",
+      "title": "WD Red Plus 8 To WD80EFZZ reconditionné garantie 1 an",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/g/BBBBBBBBBBBBBBBB/s-l225.jpg"
+      },
+      "price": {
+        "value": "129.00",
+        "currency": "EUR"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|126234567890|0",
+      "seller": {
+        "username": "reco-informatique",
+        "feedbackPercentage": "99.1",
+        "feedbackScore": 3301,
+        "sellerAccountType": "BUSINESS"
+      },
+      "condition": "Excellent - Reconditionné",
+      "conditionId": "2010",
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "6.90",
+            "currency": "EUR"
+          }
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE",
+        "BEST_OFFER"
+      ],
+      "itemWebUrl": "https://www.ebay.fr/itm/126234567890",
+      "itemLocation": {
+        "postalCode": "33***",
+        "country": "FR"
+      },
+      "itemCreationDate": "2026-11-02T17:45:10.000Z",
+      "legacyItemId": "126234567890",
+      "listingMarketplaceId": "EBAY_FR"
+    },
+    {
+      "itemId": "v1|176345678901|0",
+      "title": "Disque dur Seagate Barracuda 8 To",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/g/CCCCCCCCCCCCCCCC/s-l225.jpg"
+      },
+      "price": {
+        "value": "85.00",
+        "currency": "EUR"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|176345678901|0",
+      "seller": {
+        "username": "jdupont69",
+        "feedbackPercentage": "100.0",
+        "feedbackScore": 42,
+        "sellerAccountType": "INDIVIDUAL"
+      },
+      "condition": "Occasion",
+      "conditionId": "3000",
+      "shippingOptions": [
+        {
+          "shippingCostType": "CALCULATED"
+        }
+      ],
+      "buyingOptions": [
+        "AUCTION"
+      ],
+      "bidCount": 3,
+      "currentBidPrice": {
+        "value": "85.00",
+        "currency": "EUR"
+      },
+      "itemWebUrl": "https://www.ebay.fr/itm/176345678901",
+      "itemLocation": {
+        "postalCode": "69***",
+        "country": "FR"
+      },
+      "itemCreationDate": "2026-11-05T20:01:33.000Z",
+      "legacyItemId": "176345678901",
+      "listingMarketplaceId": "EBAY_FR"
+    },
+    {
+      "itemId": "v1|256456789012|0",
+      "title": "Disque dur 8 To HS pour pièces",
+      "price": {
+        "value": "20.00",
+        "currency": "EUR"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|256456789012|0",
+      "seller": {
+        "username": "bricoleur13",
+        "feedbackPercentage": "97.0",
+        "feedbackScore": 8,
+        "sellerAccountType": "INDIVIDUAL"
+      },
+      "condition": "Pour pièces détachées/ne fonctionne pas",
+      "conditionId": "7000",
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "itemWebUrl": "https://www.ebay.fr/itm/256456789012",
+      "itemLocation": {
+        "postalCode": "13***",
+        "country": "FR"
+      },
+      "itemCreationDate": "2026-09-14T08:00:00.000Z",
+      "legacyItemId": "256456789012",
+      "listingMarketplaceId": "EBAY_FR"
+    },
+    {
+      "itemId": "v1|335567890123|0",
+      "title": "Toshiba N300 8 To HDWG480 boîte ouverte",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/g/EEEEEEEEEEEEEEEE/s-l225.jpg"
+      },
+      "price": {
+        "value": "110.00",
+        "currency": "EUR"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|335567890123|0",
+      "seller": {
+        "username": "dealsde",
+        "feedbackPercentage": "98.9",
+        "feedbackScore": 912
+      },
+      "condition": "Neuf autre (voir détails)",
+      "conditionId": "1500",
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "9.90",
+            "currency": "EUR"
+          }
+        },
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "4.90",
+            "currency": "EUR"
+          }
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "itemWebUrl": "https://www.ebay.fr/itm/335567890123",
+      "itemLocation": {
+        "postalCode": "10***",
+        "country": "DE"
+      },
+      "itemCreationDate": "2026-10-21T11:30:00.000Z",
+      "legacyItemId": "335567890123",
+      "listingMarketplaceId": "EBAY_FR"
+    }
+  ]
+}

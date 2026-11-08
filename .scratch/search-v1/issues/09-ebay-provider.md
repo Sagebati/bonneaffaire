@@ -8,10 +8,10 @@ Owner action: create an eBay developer account and production keys.
 
 **Status:** ready-for-agent
 
-- [ ] With credentials configured, a keyword Search and a Filtered Search return eBay Listings via the CLI
-- [ ] Listing details work for an eBay Listing
-- [ ] Condition ID mapping, Price in cents, Shipping and Seller kind are correct in fixture tests built from recorded Browse API JSON
-- [ ] The OAuth token is obtained and refreshed transparently
-- [ ] Rate-limit and auth errors produce clear Provider outcomes
-- [ ] Without credentials, eBay is reported as disabled rather than failing every Search
-- [ ] A live canary test for eBay exists, excluded from the default run
+- [ ] With credentials configured, a keyword Search and a Filtered Search return eBay Listings via the CLI (passes against doc-sample fixtures; live check waits for the owner's credentials)
+- [ ] Listing details work for an eBay Listing (passes against fixtures, by Provider ID and by URL; live check waits for credentials)
+- [x] Condition ID mapping, Price in cents, Shipping and Seller kind are correct in fixture tests built from recorded Browse API JSON
+- [x] The OAuth token is obtained and refreshed transparently
+- [x] Rate-limit and auth errors produce clear Provider outcomes
+- [x] Without credentials, eBay is reported as disabled rather than failing every Search
+- [x] A live canary test for eBay exists, excluded from the default run

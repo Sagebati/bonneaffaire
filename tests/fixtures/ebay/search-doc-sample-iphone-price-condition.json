@@ -1,0 +1,363 @@
+{
+  "href": "https://api.ebay.com/buy/browse/v1/item_summary/search?q=iphone&limit=5&filter=price%3A%5B300..800%5D%2CpriceCurrency%3AUSD%2Cconditions%3A%7BNEW%7D&offset=0",
+  "total": 8751,
+  "next": "https://api.ebay.com/buy/browse/v1/item_summary/search?q=iphone&limit=5&filter=price%3A%5B300..800%5D%2CpriceCurrency%3AUSD%2Cconditions%3A%7BNEW%7D&offset=50",
+  "limit": 5,
+  "offset": 0,
+  "itemSummaries": [
+    {
+      "itemId": "v1|3**********3|5**********0",
+      "title": "NEW OTHER? Apple iPhone 6S ~ (Factory Unlocked) (T-Mobile) (AT&T)",
+      "itemGroupHref": "https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=3**********3",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/m/m**********Q/s-l225.jpg"
+      },
+      "price": {
+        "value": "399.99",
+        "currency": "USD"
+      },
+      "itemGroupType": "SELLER_DEFINED_VARIATIONS",
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|3**********3|5**********0",
+      "seller": {
+        "username": "t***e",
+        "feedbackPercentage": "99.5",
+        "feedbackScore": 5660
+      },
+      "condition": "New other (see details)",
+      "conditionId": "1500",
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "0.00",
+            "currency": "USD"
+          }
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "currentBidPrice": {
+        "value": "399.99",
+        "currency": "USD"
+      },
+      "epid": "216202209",
+      "itemWebUrl": "https://www.ebay.com/itm/NEW-OTHER-Apple-iPhone-6S-Factory-Unlocked-T-Mobile-AT-T/3**********3?hash=item4**********Q",
+      "itemLocation": {
+        "postalCode": "7****",
+        "country": "US"
+      },
+      "leafCategoryIds": [
+        "9355"
+      ],
+      "categories": [
+        {
+          "categoryId": "9355",
+          "categoryName": "Cell Phones & Smartphones"
+        },
+        {
+          "categoryId": "15032",
+          "categoryName": "Cell Phones, Smart Watches & Accessories"
+        }
+      ],
+      "additionalImages": [
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********3_2_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********3_3_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********3_4_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********3_5_0_1/225x225.jpg"
+        }
+      ],
+      "priorityListing": false,
+      "adultOnly": false,
+      "availableCoupons": false,
+      "itemCreationDate": "2022-12-25T07:14:44.000Z",
+      "itemOriginDate": "2022-12-25T07:14:44.000Z",
+      "legacyItemId": "3**********3"
+    },
+    {
+      "itemId": "v1|1**********1|0",
+      "title": "Apple iPhone 6s Plus - Space Gray 16GB (Verizon) Factory Unlocked Smartphone",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/g/5**********A/s-l225.jpg"
+      },
+      "price": {
+        "value": "398.95",
+        "currency": "USD"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|1**********1|0",
+      "seller": {
+        "username": "k***n",
+        "feedbackPercentage": "100.0",
+        "feedbackScore": 60
+      },
+      "condition": "New",
+      "conditionId": "1000",
+      "thumbnailImages": [
+        {
+          "imageUrl": "https://i.ebayimg.com/00/s/M**********y/z/51oAAOSwg31aeh4A/$_0.JPG?set_id=8**********F"
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "currentBidPrice": {
+        "value": "398.95",
+        "currency": "USD"
+      },
+      "epid": "216213677",
+      "itemWebUrl": "https://www.ebay.com/itm/Apple-iPhone-6s-Plus-Space-Gray-16GB-Verizon-Factory-Unlocked-Smartphone/1**********1?hash=item2**********A",
+      "itemLocation": {
+        "postalCode": "1****",
+        "country": "US"
+      },
+      "leafCategoryIds": [
+        "9355"
+      ],
+      "categories": [
+        {
+          "categoryId": "9355",
+          "categoryName": "Cell Phones & Smartphones"
+        },
+        {
+          "categoryId": "15032",
+          "categoryName": "Cell Phones, Smart Watches & Accessories"
+        }
+      ],
+      "priorityListing": false,
+      "adultOnly": false,
+      "availableCoupons": false,
+      "itemCreationDate": "2022-12-25T07:14:44.000Z",
+      "itemOriginDate": "2022-12-25T07:14:44.000Z",
+      "legacyItemId": "1**********1"
+    },
+    {
+      "itemId": "v1|3**********8|5**********6",
+      "title": "LIKE NEW?  Apple iPhone 6 - (Unlocked) (T-Mobile) (AT&T) WORLDWIDE!",
+      "itemGroupHref": "https://api.ebay.com/buy/browse/v1/item/get_items_by_item_group?item_group_id=3**********8",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/m/m**********g/s-l225.jpg"
+      },
+      "price": {
+        "value": "349.99",
+        "currency": "USD"
+      },
+      "itemGroupType": "SELLER_DEFINED_VARIATIONS",
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|3**********8|5**********6",
+      "seller": {
+        "username": "t***e",
+        "feedbackPercentage": "99.5",
+        "feedbackScore": 5660
+      },
+      "condition": "New other (see details)",
+      "conditionId": "1500",
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "0.00",
+            "currency": "USD"
+          }
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "currentBidPrice": {
+        "value": "349.99",
+        "currency": "USD"
+      },
+      "epid": "233752960",
+      "itemWebUrl": "https://www.ebay.com/itm/LIKE-NEW-Apple-iPhone-6-Unlocked-T-Mobile-AT-T-WORLDWIDE/3**********8?hash=item4**********g",
+      "itemLocation": {
+        "postalCode": "7****",
+        "country": "US"
+      },
+      "leafCategoryIds": [
+        "9355"
+      ],
+      "categories": [
+        {
+          "categoryId": "9355",
+          "categoryName": "Cell Phones & Smartphones"
+        },
+        {
+          "categoryId": "15032",
+          "categoryName": "Cell Phones, Smart Watches & Accessories"
+        }
+      ],
+      "additionalImages": [
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********8_2_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********8_3_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********8_4_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********8_5_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********8_6_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********8_7_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/3**********8_8_0_1/225x225.jpg"
+        }
+      ],
+      "priorityListing": false,
+      "adultOnly": false,
+      "availableCoupons": false,
+      "itemCreationDate": "2022-08-25T07:14:44.000Z",
+      "itemOriginDate": "2022-08-25T07:14:44.000Z",
+      "legacyItemId": "3**********8"
+    },
+    {
+      "itemId": "v1|1**********8|0",
+      "title": "New Inbox Apple iPhone 6s Plus - 128GB - Rose Gold (AT&T) GSM Unlocked A1634 ",
+      "subtitle": "Comes with Free BodyGuardz Glass & Free Fast Shipping ",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/g/z**********e/s-l225.jpg"
+      },
+      "price": {
+        "value": "499.99",
+        "currency": "USD"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|1**********8|0",
+      "seller": {
+        "username": "a***s",
+        "feedbackPercentage": "99.6",
+        "feedbackScore": 63496
+      },
+      "condition": "New",
+      "conditionId": "1000",
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "0.00",
+            "currency": "USD"
+          }
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "currentBidPrice": {
+        "value": "499.99",
+        "currency": "USD"
+      },
+      "epid": "216194804",
+      "itemWebUrl": "https://www.ebay.com/itm/New-Inbox-Apple-iPhone-6s-Plus-128GB-Rose-Gold-AT-T-GSM-Unlocked-A1634/1**********8?hash=item2**********e",
+      "itemLocation": {
+        "postalCode": "7****",
+        "country": "US"
+      },
+      "leafCategoryIds": [
+        "9355"
+      ],
+      "categories": [
+        {
+          "categoryId": "9355",
+          "categoryName": "Cell Phones & Smartphones"
+        },
+        {
+          "categoryId": "15032",
+          "categoryName": "Cell Phones, Smart Watches & Accessories"
+        }
+      ],
+      "priorityListing": false,
+      "adultOnly": false,
+      "availableCoupons": false,
+      "itemCreationDate": "2022-08-25T07:14:44.000Z",
+      "itemOriginDate": "2022-08-25T07:14:44.000Z",
+      "legacyItemId": "1**********8"
+    },
+    {
+      "itemId": "v1|2**********4|0",
+      "title": "Apple iPhone 6s Plus - 16GB - Space Gray Sprint A1687",
+      "image": {
+        "imageUrl": "https://i.ebayimg.com/thumbs/images/g/f**********2/s-l225.jpg"
+      },
+      "price": {
+        "value": "300.00",
+        "currency": "USD"
+      },
+      "itemHref": "https://api.ebay.com/buy/browse/v1/item/v1|2**********4|0",
+      "seller": {
+        "username": "e***n",
+        "feedbackPercentage": "99.6",
+        "feedbackScore": 2216
+      },
+      "condition": "New",
+      "conditionId": "1000",
+      "thumbnailImages": [
+        {
+          "imageUrl": "https://i.ebayimg.com/00/s/M**********=/z/fugAAOSwlzRaeig2/$_0.JPG?set_id=8**********7"
+        }
+      ],
+      "shippingOptions": [
+        {
+          "shippingCostType": "FIXED",
+          "shippingCost": {
+            "value": "0.00",
+            "currency": "USD"
+          }
+        }
+      ],
+      "buyingOptions": [
+        "FIXED_PRICE"
+      ],
+      "currentBidPrice": {
+        "value": "300.00",
+        "currency": "USD"
+      },
+      "epid": "219486022",
+      "itemWebUrl": "https://www.ebay.com/itm/Apple-iPhone-6s-Plus-16GB-Space-Gray-Sprint-A1687/2**********4?hash=item3**********2",
+      "itemLocation": {
+        "postalCode": "0****",
+        "country": "US"
+      },
+      "leafCategoryIds": [
+        "9355"
+      ],
+      "categories": [
+        {
+          "categoryId": "9355",
+          "categoryName": "Cell Phones & Smartphones"
+        },
+        {
+          "categoryId": "15032",
+          "categoryName": "Cell Phones, Smart Watches & Accessories"
+        }
+      ],
+      "additionalImages": [
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/2**********4_2_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/2**********4_3_0_1/225x225.jpg"
+        },
+        {
+          "imageUrl": "https://galleryplus.ebayimg.com/ws/web/2**********4_4_0_1/225x225.jpg"
+        }
+      ],
+      "priorityListing": false,
+      "adultOnly": false,
+      "availableCoupons": false,
+      "itemCreationDate": "2022-12-25T07:14:44.000Z",
+      "itemOriginDate": "2022-12-25T07:14:44.000Z",
+      "legacyItemId": "2**********4"
+    }
+  ]
+}

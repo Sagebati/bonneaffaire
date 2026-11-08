@@ -1,0 +1,69 @@
+{
+  "itemId": "v1|176345678901|0",
+  "sellerItemRevision": "1",
+  "title": "Disque dur Seagate Barracuda 8 To",
+  "shortDescription": "Disque dur interne 3,5 pouces, 8 To, environ 12 000 heures.",
+  "price": {
+    "value": "85.00",
+    "currency": "EUR"
+  },
+  "categoryPath": "Informatique, réseaux|Composants, pièces détachées|Disques durs (HDD, SSD et NAS)",
+  "categoryIdPath": "58058|175673|165",
+  "condition": "Occasion",
+  "conditionId": "3000",
+  "conditionDescription": "Fonctionne parfaitement, aucun secteur défectueux.",
+  "itemLocation": {
+    "city": "Lyon",
+    "postalCode": "69***",
+    "country": "FR"
+  },
+  "image": {
+    "imageUrl": "https://i.ebayimg.com/images/g/CCCCCCCCCCCCCCCC/s-l1600.jpg"
+  },
+  "additionalImages": [
+    {
+      "imageUrl": "https://i.ebayimg.com/images/g/CCCCCCCCCCCCCCC2/s-l1600.jpg"
+    },
+    {
+      "imageUrl": "https://i.ebayimg.com/images/g/CCCCCCCCCCCCCCC3/s-l1600.jpg"
+    }
+  ],
+  "brand": "Seagate",
+  "mpn": "ST8000DM004",
+  "seller": {
+    "username": "jdupont69",
+    "feedbackPercentage": "100.0",
+    "feedbackScore": 42,
+    "sellerAccountType": "INDIVIDUAL"
+  },
+  "estimatedAvailabilities": [
+    {
+      "deliveryOptions": [
+        "SHIP_TO_HOME"
+      ],
+      "estimatedAvailabilityStatus": "IN_STOCK",
+      "estimatedAvailableQuantity": 1,
+      "estimatedSoldQuantity": 0
+    }
+  ],
+  "shippingOptions": [
+    {
+      "shippingServiceCode": "FR_ColiposteColissimo",
+      "type": "Standard Shipping",
+      "shippingCost": {
+        "value": "7.50",
+        "currency": "EUR"
+      },
+      "quantityUsedForEstimate": 1,
+      "shippingCostType": "FIXED"
+    }
+  ],
+  "buyingOptions": [
+    "AUCTION"
+  ],
+  "itemWebUrl": "https://www.ebay.fr/itm/176345678901",
+  "description": "<div><p>Disque dur <b>Seagate Barracuda 8 To</b>.</p><p>Testé avec CrystalDiskInfo : état bon.</p></div>",
+  "itemCreationDate": "2026-11-05T20:01:33.000Z",
+  "legacyItemId": "176345678901",
+  "listingMarketplaceId": "EBAY_FR"
+}
