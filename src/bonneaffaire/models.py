@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
 DEFAULT_LIMIT = 50
 
@@ -66,6 +66,61 @@ class Listing(BaseModel):
         if len({part.currency for part in parts}) != 1:
             return None
         return Money(cents=sum(part.cents for part in parts), currency=self.price.currency)
+
+
+class Seller(BaseModel):
+    """Who sells a Listing, as far as the Provider says."""
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str | None = None
+    url: str | None = None
+
+
+class ListingDetails(Listing):
+    """A Listing plus what only its own page shows (from Get Listing)."""
+
+    description: str | None = None
+    photos: list[str] = Field(default_factory=list)
+    seller: Seller | None = None
+    availability: str | None = None
+    """The Provider's stock state, e.g. schema.org's 'InStock' or 'OutOfStock'."""
+    other_offers: list[Listing] = Field(default_factory=list)
+    """On retailers, other offers for the same product, each its own Listing."""
+
+
+class ListingRequest(BaseModel):
+    """Which Listing to get: a Provider plus its Provider ID, or a Listing URL."""
+
+    model_config = ConfigDict(frozen=True)
+
+    provider: str | None = None
+    provider_id: str | None = None
+    url: str | None = None
+
+    @model_validator(mode="after")
+    def _one_way_to_name_the_listing(self) -> ListingRequest:
+        if self.url is None and (self.provider is None or self.provider_id is None):
+            raise ValueError("give a Listing URL, or a Provider and a Provider ID")
+        return self
+
+
+class ListingStatus(StrEnum):
+    OK = "ok"
+    NOT_FOUND = "not_found"
+    UNSUPPORTED = "unsupported"
+    BLOCKED = "blocked"
+    TIMED_OUT = "timed_out"
+    FAILED = "failed"
+
+
+class ListingResult(BaseModel):
+    """What Get Listing returns: the details when status is ok, otherwise why not."""
+
+    status: ListingStatus
+    provider: str | None = None
+    listing: ListingDetails | None = None
+    message: str | None = None
 
 
 class SearchQuery(BaseModel):
